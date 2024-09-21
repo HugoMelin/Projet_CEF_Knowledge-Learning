@@ -3,6 +3,5 @@ module.exports = {
 
   rules: {
   // Mes règles personnalisées
-  "require-await" : false,
   },
 };

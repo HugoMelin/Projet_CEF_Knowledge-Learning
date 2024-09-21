@@ -4,9 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:backend": "nodemon ./backend/bin/www",
-    "start": "concurrently \"npm run start:backend\"",
-    "database": "env-cmd -f ./.env nodemon ./backend/database/database.js"
+    "start:backend": "env-cmd -f ./.env nodemon ./backend/bin/www",
+    "start": "concurrently \"npm run start:backend\""
   },
   "keywords": [],
   "author": "",
