@@ -1,5 +1,5 @@
 -- Table répondant au schéma suivant :
--- users = (id_user, password, is_verified, username, email, created_at, modified_at);
+-- users = (id_user, password, is_verified, username, email, role, verification_token, created_at, modified_at);
 -- themes = (id_themes, name);
 -- courses = (id_courses, title, description, price, #id_themes;
 -- lessons = (id_lessons, title, content, video_url, price, #id_courses);
@@ -17,6 +17,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL, 
     role TEXT DEFAULT "['role-user']",
     is_verified BOOLEAN NOT NULL DEFAULT false,
+    verification_token VARCHAR(255) DEFAULT null,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

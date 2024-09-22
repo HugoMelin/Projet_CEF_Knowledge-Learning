@@ -1,4 +1,6 @@
 const express = require('express');
+const usersRoute = require('./users');
+const verifyRouter = require('./verify');
 
 const router = express.Router();
 
@@ -6,5 +8,9 @@ const router = express.Router();
 router.get('/', (req, res) => {
   res.send('Test Api');
 });
+
+router.use('/users', usersRoute);
+
+router.use('/verify', verifyRouter);
 
 module.exports = router;
