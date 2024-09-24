@@ -4,6 +4,8 @@ const usersCtrl = require('../services/users');
 
 const router = express.Router();
 
+const userController = require('../controllers/userController');
+
 router.post('/', async (req, res) => {
   const userData = req.body;
   try {
@@ -22,32 +24,9 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
-  try {
-    const users = await usersCtrl.getAllusers();
-    res.status(200).json(users);
-  } catch (error) {
-    if (error.message === 'Aucun utilisateur trouvé') {
-      res.status(204).json({ message: error.message });
-    } else {
-      res.status(500).send(error.message);
-    }
-  }
-});
+router.get('/', userController.getAllUsers);
 
-router.get('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await usersCtrl.getUser(id);
-    res.status(200).json(user);
-  } catch (error) {
-    if (error.message === 'Utilisateur non trouvé') {
-      res.status(404).json({ message: error.message });
-    } else {
-      res.status(500).send(error.message);
-    }
-  }
-});
+router.get('/:id', userController.getOneUserById);
 
 router.delete('/:id', async (req, res) => {
   try {
