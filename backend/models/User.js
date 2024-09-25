@@ -56,6 +56,29 @@ class User {
     return response;
   }
 
+  static async update(user, dataToUpdate) {
+    const {
+      username,
+      email,
+      password,
+      role,
+      isVerified,
+    } = dataToUpdate;
+
+    const response = await db.query(`
+      UPDATE users 
+      SET 
+        username = COALESCE(?, username),
+        email = COALESCE(?, email),
+        password = COALESCE(?, password),
+        role = COALESCE(?, role),
+        is_verified = COALESCE(?, is_verified)
+      WHERE id_user = ?;
+      `, [username, email, password, role, isVerified, user.idUser]);
+
+    return response;
+  }
+
   static async verifyUser(token) {
     // Étape 1 : On recherche l'utilisateur avec le token de vérification
     const [users] = await db.query(`

@@ -40,7 +40,29 @@ exports.deleteUser = async (req, res) => {
     const userToDelete = await User.findById(id);
     if (userToDelete) {
       await User.delete(userToDelete);
-      res.status(200).json({ message: 'User succefully delete', userDeleted: userToDelete });
+      res.status(200).json({ message: 'User successfully delete', userDeleted: userToDelete });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userData = req.body;
+
+    if (userData.password) {
+      userData.password = await bcrypt.hash(userData.password, 10);
+    }
+
+    const userToUpdate = await User.findById(id);
+    if (userToUpdate) {
+      await User.update(userToUpdate, userData);
+      const updatedUser = await User.findById(id);
+      res.status(200).json({ message: 'User successfully updated', userUpdated: updatedUser });
+    } else {
+      res.status(404).json('No user found');
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
