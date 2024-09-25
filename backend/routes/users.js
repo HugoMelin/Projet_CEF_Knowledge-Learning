@@ -6,43 +6,13 @@ const router = express.Router();
 
 const userController = require('../controllers/userController');
 
-// router.post('/', async (req, res) => {
-//   const userData = req.body;
-//   try {
-//     const newUser = await usersCtrl.createUser(userData);
-//     res.status(201).json({
-//       message: 'Utilisateur créé avec succès',
-//       user: newUser,
-//     });
-//   } catch (error) {
-//     if (error.message === 'Un utilisateur avec cet email existe déjà'
-//       || error.message === 'Cet email est déjà utilisé') {
-//       res.status(409).json({ message: error.message });
-//     } else {
-//       res.status(500).send(error.message);
-//     }
-//   }
-// });
-
 router.post('/', userController.createUser);
 
 router.get('/', userController.getAllUsers);
 
 router.get('/:id', userController.getOneUserById);
 
-router.delete('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await usersCtrl.deleteUser(id);
-    res.status(200).json(result);
-  } catch (error) {
-    if (error.message === 'Utilisateur non trouvé') {
-      res.status(404).json({ message: error.message });
-    } else {
-      res.status(500).send(error.message);
-    }
-  }
-});
+router.delete('/:id', userController.deleteUser);
 
 router.patch('/:id', async (req, res) => {
   try {

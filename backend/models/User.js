@@ -46,6 +46,16 @@ class User {
     return result[0];
   }
 
+  static async delete(userData) {
+    const response = await db.query(`
+      DELETE 
+      FROM users 
+      WHERE id_user = ?
+    `, [userData.idUser]);
+
+    return response;
+  }
+
   static async verifyUser(token) {
     // Étape 1 : On recherche l'utilisateur avec le token de vérification
     const [users] = await db.query(`
