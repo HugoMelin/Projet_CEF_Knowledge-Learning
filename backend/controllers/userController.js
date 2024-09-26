@@ -113,30 +113,33 @@ exports.authenticate = async (req, res) => {
     const user = await User.findByEmail(email);
 
     if (user) {
-      bcrypt.compare(password, user.password, (err, response) => {
-        if (err) {
-          throw new Error(err);
-        }
-        if (response) {
-          const expireIn = 24 * 60 * 60;
-          const token = jwt.sign(
-            {
-              user,
-            },
-            process.env.SECRET_KEY,
-            {
-              expiresIn: expireIn,
-            },
-          );
+      const isPasswordValid = await bcrypt.compare(password, user.password);
 
-          res.header('Authorization', `Bearer ${token}`);
+      if (!isPasswordValid) {
+        return res.status(403).json('Mot de passe incorrect');
+      }
 
-          return res.status(200).json('Authentification réussi');
-        }
+      const expireIn = 24 * 60 * 60;
+      const token = jwt.sign(
+        {
+          user,
+        },
+        process.env.SECRET_KEY,
+        {
+          expiresIn: expireIn,
+        },
+      );
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        maxAge: expireIn * 1000,
       });
-    } else {
-      return res.status(403).json('Mauvaise identification');
+
+      res.header('Authorization', `Bearer ${token}`);
+
+      return res.status(200).json('Authentification réussi');
     }
+    return res.status(403).json('Mauvaise adresse mail');
   } catch (error) {
     return res.status(500).json(error);
   }
