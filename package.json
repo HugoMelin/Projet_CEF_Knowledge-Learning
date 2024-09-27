@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:backend": "env-cmd -f ./.env nodemon ./backend/bin/www",
-    "start": "concurrently \"npm run start:backend\""
+    "start": "concurrently \"npm run start:backend\" \"mailhog\""
   },
   "keywords": [],
   "author": "",
