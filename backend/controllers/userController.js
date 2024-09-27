@@ -9,9 +9,14 @@ exports.createUser = async (req, res) => {
   try {
     const userData = req.body;
     if (!userData.email || !userData.password || !userData.username) {
-      res.status(400).json({ message: 'Email, mot de passe et nom d\'utilisateur sont requis' });
+      return res.status(400).json({ message: 'Email, mot de passe et nom d\'utilisateur sont requis' });
     }
 
+    const existingUser = await User.findByEmail(userData.email);
+    if (existingUser) {
+      console.error('Un utilisateur avec cet email existe déjà !');
+      return res.status(404).json({ message: 'Un utilisateur avec cet email existe déjà !' });
+    }
     userData.password = await bcrypt.hash(userData.password, 10);
     userData.verificationToken = await sendVerificationEmail(userData.email);
     const newUser = await User.create(userData);
