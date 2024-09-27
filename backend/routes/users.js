@@ -7,9 +7,9 @@ const secure = require('../middleware/secure');
 
 router.post('/', userController.createUser);
 
-router.get('/', userController.getAllUsers);
+router.get('/', secure.checkAdminRole, userController.getAllUsers);
 
-router.get('/:id', userController.getOneUserById);
+router.get('/:id', secure.checkJWT, userController.getOneUserById);
 
 router.delete('/:id', userController.deleteUser);
 
