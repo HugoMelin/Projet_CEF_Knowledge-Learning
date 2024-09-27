@@ -3,5 +3,6 @@ module.exports = {
 
   rules: {
   // Mes règles personnalisées
+    'consistent-return': 0,
   },
 };

@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const { sendVerificationEmail } = require('../services/emailsService');
@@ -8,9 +9,14 @@ exports.createUser = async (req, res) => {
   try {
     const userData = req.body;
     if (!userData.email || !userData.password || !userData.username) {
-      res.status(400).json({ message: 'Email, mot de passe et nom d\'utilisateur sont requis' });
+      return res.status(400).json({ message: 'Email, mot de passe et nom d\'utilisateur sont requis' });
     }
 
+    const existingUser = await User.findByEmail(userData.email);
+    if (existingUser) {
+      console.error('Un utilisateur avec cet email existe déjà !');
+      return res.status(404).json({ message: 'Un utilisateur avec cet email existe déjà !' });
+    }
     userData.password = await bcrypt.hash(userData.password, 10);
     userData.verificationToken = await sendVerificationEmail(userData.email);
     const newUser = await User.create(userData);
@@ -95,13 +101,51 @@ exports.verifyUser = async (req, res) => {
   try {
     const { token } = req.params;
     const result = await User.verifyUser(token);
-    res.status(200).json(result);
+    return res.status(200).json(result);
   } catch (error) {
     if (error.message === 'Token de vérification invalide ou déjà utilisé') {
-      res.status(400).send(error.message);
-    } else {
-      console.error(`Erreur lors de la vérification de l'utilisateur: ${error}`);
-      res.status(500).send(error.message);
+      return res.status(400).send(error.message);
     }
+    console.error(`Erreur lors de la vérification de l'utilisateur: ${error}`);
+    return res.status(500).send(error.message);
+  }
+};
+
+exports.authenticate = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findByEmail(email);
+
+    if (user) {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+        return res.status(403).json('Mot de passe incorrect');
+      }
+
+      const expireIn = 24 * 60 * 60;
+      const token = jwt.sign(
+        {
+          user,
+        },
+        process.env.SECRET_KEY,
+        {
+          expiresIn: expireIn,
+        },
+      );
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        maxAge: expireIn * 1000,
+      });
+
+      res.header('Authorization', `Bearer ${token}`);
+
+      return res.status(200).json('Authentification réussi');
+    }
+    return res.status(403).json('Mauvaise adresse mail');
+  } catch (error) {
+    return res.status(500).json(error);
   }
 };
