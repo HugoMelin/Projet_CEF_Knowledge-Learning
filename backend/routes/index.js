@@ -2,6 +2,7 @@ const express = require('express');
 const usersRoute = require('./users');
 const themesRoute = require('./themes');
 const courseRoute = require('./courses');
+const lessonRouter = require('./lessons');
 const verifyRouter = require('./verify');
 
 const router = express.Router();
@@ -16,6 +17,8 @@ router.use('/users', usersRoute);
 router.use('/themes', themesRoute);
 
 router.use('/courses', courseRoute);
+
+router.use('/lessons', lessonRouter);
 
 router.use('/verify', verifyRouter);
 
