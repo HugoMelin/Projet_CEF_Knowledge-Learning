@@ -1,6 +1,7 @@
 const express = require('express');
 const usersRoute = require('./users');
 const themesRoute = require('./themes');
+const courseRoute = require('./courses');
 const verifyRouter = require('./verify');
 
 const router = express.Router();
@@ -13,6 +14,8 @@ router.get('/', (req, res) => {
 router.use('/users', usersRoute);
 
 router.use('/themes', themesRoute);
+
+router.use('/courses', courseRoute);
 
 router.use('/verify', verifyRouter);
 
