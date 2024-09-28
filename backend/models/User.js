@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const db = require('../database/database');
 
 class User {

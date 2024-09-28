@@ -11,6 +11,7 @@ exports.checkJWT = async (req, res, next) => {
   if (token) {
     jwt.verify(token, SECRET_KEY, (err, decoded) => {
       if (err) {
+        console.error('Token invalide');
         return res.status(401).json({ message: 'Token invalide' });
       }
       req.decoded = decoded;
@@ -35,6 +36,7 @@ exports.checkJWT = async (req, res, next) => {
       next();
     });
   } else {
+    console.error('Authentification requise');
     return res.status(401).json({ message: 'Authentification requise' });
   }
 };
@@ -46,6 +48,7 @@ exports.checkAdminRole = async (req, res, next) => {
   }
 
   if (!token) {
+    console.error('Authentification requise');
     return res.status(401).json({ message: 'Authentification requise' });
   }
 
@@ -54,6 +57,7 @@ exports.checkAdminRole = async (req, res, next) => {
     req.user = decoded.user;
 
     if (!req.user.role.includes('role-admin')) {
+      console.error('Accès refusé. Rôle administrateur requis');
       return res.status(403).json({ message: 'Accès refusé. Rôle administrateur requis' });
     }
 
@@ -74,11 +78,14 @@ exports.checkAdminRole = async (req, res, next) => {
     next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
+      console.error('Token expiré');
       return res.status(401).json({ message: 'Token expiré' });
     }
     if (error instanceof jwt.JsonWebTokenError) {
+      console.error('Token invalide');
       return res.status(401).json({ message: 'Token invalide' });
     }
+    console.error('Erreur interne du serveur');
     return res.status(500).json({ message: 'Erreur interne du serveur' });
   }
 };
