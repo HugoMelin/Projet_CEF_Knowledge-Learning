@@ -3,23 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start:backend": "env-cmd -f ./.env nodemon ./backend/bin/www",
-    "start": "concurrently \"npm run start:backend\" \"mailhog\""
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "concurrently": "^9.0.1",
-    "env-cmd": "^10.1.0",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.30.0",
-    "nodemon": "^3.1.5"
-  },
-  "dependencies": {
-    "jsonwebtoken": "^9.0.2"
+    "eslint-plugin-import": "^2.30.0"
   }
 }
