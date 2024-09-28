@@ -22,6 +22,7 @@ services:
       MYSQL_PASSWORD: hmelin
     volumes:
       - db_data:/var/lib/mysql
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
