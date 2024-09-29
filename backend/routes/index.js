@@ -4,6 +4,7 @@ const themesRoute = require('./themes');
 const courseRoute = require('./courses');
 const lessonRouter = require('./lessons');
 const completedLessonRouter = require('./completedLessons');
+const completedCourseRouter = require('./completedCourses');
 const verifyRouter = require('./verify');
 
 const router = express.Router();
@@ -22,6 +23,8 @@ router.use('/courses', courseRoute);
 router.use('/lessons', lessonRouter);
 
 router.use('/completed_lessons', completedLessonRouter);
+
+router.use('/completed_courses', completedCourseRouter);
 
 router.use('/verify', verifyRouter);
 

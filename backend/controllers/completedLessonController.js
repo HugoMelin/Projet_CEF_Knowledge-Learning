@@ -1,4 +1,4 @@
-const CompletedLesson = require('../models/completedLesson');
+const CompletedLesson = require('../models/CompletedLesson');
 
 exports.createCompletedLesson = async (req, res) => {
   try {
@@ -10,8 +10,8 @@ exports.createCompletedLesson = async (req, res) => {
     const existingCompletedLesson = await CompletedLesson
       .findByUserAndLessonsId(lessonData.idUser, lessonData.idLessons);
     if (existingCompletedLesson) {
-      console.error('Cette utilisateur à déjà validé cette lesson');
-      return res.status(500).json({ message: 'Cette utilisateur à déjà validé cette lesson' });
+      console.error('Cet utilisateur à déjà validé cette lesson');
+      return res.status(500).json({ message: 'Cet utilisateur à déjà validé cette lesson' });
     }
 
     const newCompletedLesson = await CompletedLesson.create(lessonData);
@@ -56,8 +56,8 @@ exports.getCompletedLessonsByUserIdAndLessonsId = async (req, res) => {
     const { userId, lessonId } = req.params;
     const completedLessons = await CompletedLesson.findByUserAndLessonsId(userId, lessonId);
     if (!completedLessons) {
-      console.error('Cette utilisateur n\'a pas complété cette leçon');
-      return res.status(404).json({ message: 'Cette utilisateur n\'a pas complété cette leçon' });
+      console.error('Cet utilisateur n\'a pas complété cette leçon');
+      return res.status(404).json({ message: 'Cet utilisateur n\'a pas complété cette leçon' });
     }
     res.status(200).json(completedLessons);
   } catch (error) {
