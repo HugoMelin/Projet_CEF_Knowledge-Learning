@@ -1,4 +1,5 @@
 const CompletedLesson = require('../models/CompletedLesson');
+const CompletionService = require('../services/completionService');
 
 exports.createCompletedLesson = async (req, res) => {
   try {
@@ -14,7 +15,9 @@ exports.createCompletedLesson = async (req, res) => {
       return res.status(500).json({ message: 'Cet utilisateur à déjà validé cette lesson' });
     }
 
-    const newCompletedLesson = await CompletedLesson.create(lessonData);
+    // const newCompletedLesson = await CompletedLesson.create(lessonData);
+    const newCompletedLesson = await CompletionService
+      .handleLessonCompletion(lessonData.idUser, lessonData.idLessons);
     res.status(201).json({ message: 'Leçon complétée enregistrée avec succès.', completedLesson: newCompletedLesson });
   } catch (error) {
     console.error(`Erreur lors de l'enregistrement de la leçon complétée: ${error}`);

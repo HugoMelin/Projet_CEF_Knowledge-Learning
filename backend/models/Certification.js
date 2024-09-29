@@ -10,7 +10,7 @@ class Certification {
 
   static async create(certificationData) {
     try {
-      // Check if all courses in the course are completed
+      // Check if all courses in the theme are completed
       const allCoursesCompleted = await this
         .checkAllCoursesCompleted(certificationData.idUser, certificationData.idThemes);
       if (!allCoursesCompleted) {
