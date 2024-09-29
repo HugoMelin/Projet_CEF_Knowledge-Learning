@@ -50,7 +50,7 @@ class CompletedLesson {
       const result = rows.map((row) => new CompletedLesson(...Object.values(row)));
       return result[0];
     } catch (error) {
-      console.error(`Erreur lors de la recherche des leçons complétées pour un cours: ${error}`);
+      console.error(`Erreur lors de la recherche de la leçon complétée par l'utilisateur: ${error}`);
       throw error;
     }
   }
