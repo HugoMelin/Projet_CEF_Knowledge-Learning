@@ -51,10 +51,21 @@ CREATE TABLE purchases (
     id_user INT NOT NULL,
     id_courses INT,
     id_lessons INT,
+    id_invoice INT,
     purchase_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_user) REFERENCES users(id_user),
     FOREIGN KEY (id_courses) REFERENCES courses(id_courses),
-    FOREIGN KEY (id_lessons) REFERENCES lessons(id_lessons)
+    FOREIGN KEY (id_lessons) REFERENCES lessons(id_lessons),
+    FOREIGN KEY (id_invoice) REFERENCES invoices(id_invoice)
+);
+
+CREATE TABLE invoices(
+    id_invoice INT PRIMARY KEY AUTO_INCREMENT,
+    id_user INT NOT NULL,
+    price DECIMAL(15,2) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY(id_user) REFERENCES users(id_user)
 );
 
 CREATE TABLE certifications (

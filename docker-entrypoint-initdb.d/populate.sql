@@ -42,10 +42,21 @@ CREATE TABLE IF NOT EXISTS purchases (
     id_user INT NOT NULL,
     id_courses INT,
     id_lessons INT,
+    id_invoice INT,
     purchase_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_user) REFERENCES users(id_user),
     FOREIGN KEY (id_courses) REFERENCES courses(id_courses),
-    FOREIGN KEY (id_lessons) REFERENCES lessons(id_lessons)
+    FOREIGN KEY (id_lessons) REFERENCES lessons(id_lessons),
+    FOREIGN KEY (id_invoice) REFERENCES invoices(id_invoice)
+);
+
+CREATE TABLE IF NOT EXISTS invoices(
+    id_invoice INT PRIMARY KEY AUTO_INCREMENT,
+    id_user INT NOT NULL,
+    price DECIMAL(15,2) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY(id_user) REFERENCES users(id_user)
 );
 
 CREATE TABLE IF NOT EXISTS certifications (
@@ -139,17 +150,29 @@ INSERT INTO lessons (title, content, video_url, price, id_courses) VALUES
 ('Text Classification', 'Implement text classification models', 'https://example.com/text-classification', 39.99, 10),
 ('Sentiment Analysis', 'Analyze sentiment in text data', 'https://example.com/sentiment-analysis', 39.99, 10);
 
-INSERT INTO purchases (id_user, id_courses, purchase_date) VALUES
-(1, 1, '2024-08-15 10:30:00'),
-(2, 3, '2024-08-16 14:45:00'),
-(4, 2, '2024-08-17 09:15:00'),
-(6, 5, '2024-08-18 11:00:00'),
-(8, 4, '2024-08-19 16:30:00'),
-(10, 7, '2024-08-20 13:45:00'),
-(12, 6, '2024-08-21 10:00:00'),
-(14, 9, '2024-08-22 15:15:00'),
-(16, 8, '2024-08-23 12:30:00'),
-(18, 10, '2024-08-24 14:00:00');
+INSERT INTO purchases (id_user, id_courses, id_invoice, purchase_date) VALUES
+(1, 1, 1, '2024-08-15 10:30:00'),
+(2, 3, 2, '2024-08-16 14:45:00'),
+(4, 2, 3, '2024-08-17 09:15:00'),
+(6, 5, 4, '2024-08-18 11:00:00'),
+(8, 4, 5, '2024-08-19 16:30:00'),
+(10, 7, 6, '2024-08-20 13:45:00'),
+(12, 6, 7, '2024-08-21 10:00:00'),
+(14, 9, 8, '2024-08-22 15:15:00'),
+(16, 8, 9, '2024-08-23 12:30:00'),
+(18, 10, 10, '2024-08-24 14:00:00');
+
+INSERT INTO invoices (id_user, price, created_at, modified_at) VALUES
+(1, 45.00, '2024-08-15 10:30:00', '2024-08-15 10:30:00'),
+(2, 24.95, '2024-08-16 14:45:00', '2024-08-16 14:45:00'),
+(4, 45.00, '2024-08-17 09:15:00', '2024-08-17 09:15:00'),
+(6, 24.95, '2024-08-18 11:00:00', '2024-08-18 11:00:00'),
+(8, 45.00, '2024-08-19 16:30:00', '2024-08-19 16:30:00'),
+(10, 24.95, '2024-08-20 13:45:00', '2024-08-20 13:45:00'),
+(12, 45.00, '2024-08-21 10:00:00', '2024-08-21 10:00:00'),
+(14, 24.95, '2024-08-22 15:15:00', '2024-08-22 15:15:00'),
+(16, 45.00, '2024-08-23 12:30:00', '2024-08-23 12:30:00'),
+(18, 24.95, '2024-08-24 14:00:00', '2024-08-24 14:00:00'),
 
 INSERT INTO certifications (id_user, id_themes, obtained_date) VALUES
 (1, 1, '2024-09-01 11:30:00'),
