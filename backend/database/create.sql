@@ -3,7 +3,8 @@
 -- themes = (id_themes, name);
 -- courses = (id_courses, title, description, price, #id_themes;
 -- lessons = (id_lessons, title, content, video_url, price, #id_courses);
--- purchases = (#id_user, #id_courses, #id_lessons, id_purchases, purchase_date);
+-- invoices = (id_invoice, price, created_at, modified_at, #id_user);
+-- purchases = (#id_user, #id_courses, #id_lessons, #id_invoice, id_purchases, purchase_date);
 -- certifications = (#id_user, #id_themes, id_certifications, obtained_date);
 -- completed_lessons = (#id_user, #id_lessons, completed_date);
 -- completed_courses = (#id_user, #id_courses, completed_date);
@@ -46,19 +47,6 @@ CREATE TABLE lessons (
     FOREIGN KEY (id_courses) REFERENCES courses(id_courses)
 );
 
-CREATE TABLE purchases (
-    id_purchases INT PRIMARY KEY AUTO_INCREMENT,
-    id_user INT NOT NULL,
-    id_courses INT,
-    id_lessons INT,
-    id_invoice INT,
-    purchase_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_user) REFERENCES users(id_user),
-    FOREIGN KEY (id_courses) REFERENCES courses(id_courses),
-    FOREIGN KEY (id_lessons) REFERENCES lessons(id_lessons),
-    FOREIGN KEY (id_invoice) REFERENCES invoices(id_invoice)
-);
-
 CREATE TABLE invoices(
     id_invoice INT PRIMARY KEY AUTO_INCREMENT,
     id_user INT NOT NULL,
@@ -66,6 +54,19 @@ CREATE TABLE invoices(
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY(id_user) REFERENCES users(id_user)
+);
+
+CREATE TABLE purchases (
+    id_purchases INT PRIMARY KEY AUTO_INCREMENT,
+    id_user INT NOT NULL,
+    id_courses INT,
+    id_lessons INT,
+    id_invoice INT NOT NULL,
+    purchase_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_user) REFERENCES users(id_user),
+    FOREIGN KEY (id_courses) REFERENCES courses(id_courses),
+    FOREIGN KEY (id_lessons) REFERENCES lessons(id_lessons),
+    FOREIGN KEY (id_invoice) REFERENCES invoices(id_invoice)
 );
 
 CREATE TABLE certifications (
