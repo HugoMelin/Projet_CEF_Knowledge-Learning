@@ -49,8 +49,6 @@ class PaymentController {
         return Purchase.create(purchaseData);
       }));
 
-      console.log(newInvoice);
-
       res.redirect('/success-page'); // Redirigez vers une page de succès
     } catch (error) {
       console.error('Erreur lors du traitement du succès du paiement:', error);
