@@ -13,6 +13,10 @@ class StripeService {
           currency: 'eur',
           product_data: {
             name: item.name,
+            metadata: {
+              type: item.type,
+              id: item.id.toString(),
+            },
           },
           unit_amount: item.price * 100, // Stripe utilise les centimes
         },
@@ -24,6 +28,18 @@ class StripeService {
     });
 
     return session;
+  }
+
+  async getSessionDetails(sessionId) {
+    const session = await this.stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['line_items'],
+    });
+    return session;
+  }
+
+  async getProductDetails(productId) {
+    const data = await this.stripe.products.retrieve(productId);
+    return data;
   }
 }
 

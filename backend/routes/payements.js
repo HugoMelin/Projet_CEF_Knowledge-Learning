@@ -9,4 +9,6 @@ const paymentController = new PaymentController(stripeService);
 
 router.post('/', paymentController.createCheckoutSession.bind(paymentController));
 
+router.get('/success', paymentController.handleSuccess.bind(paymentController));
+
 module.exports = router;
