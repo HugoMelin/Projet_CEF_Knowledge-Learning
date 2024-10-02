@@ -6,6 +6,9 @@ const lessonRouter = require('./lessons');
 const completedLessonRouter = require('./completedLessons');
 const completedCourseRouter = require('./completedCourses');
 const certificationRouter = require('./certifications');
+const payementRouter = require('./payements');
+const invoiceRouter = require('./invoices');
+const purchaseRouter = require('./purchases');
 const verifyRouter = require('./verify');
 
 const router = express.Router();
@@ -28,6 +31,12 @@ router.use('/completed_lessons', completedLessonRouter);
 router.use('/completed_courses', completedCourseRouter);
 
 router.use('/certifications', certificationRouter);
+
+router.use('/create-checkout-session', payementRouter);
+
+router.use('/invoices', invoiceRouter);
+
+router.use('/purchases', purchaseRouter);
 
 router.use('/verify', verifyRouter);
 
