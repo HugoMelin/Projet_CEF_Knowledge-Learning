@@ -5,7 +5,8 @@ class StripeService {
     this.stripe = stripe;
   }
 
-  async createCheckoutSession(items, successUrl, cancelUrl) {
+  async createCheckoutSession(items, successUrl, cancelUrl, userId) {
+    console.log(userId);
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: items.map((item) => ({
@@ -25,6 +26,7 @@ class StripeService {
       mode: 'payment',
       success_url: successUrl,
       cancel_url: cancelUrl,
+      client_reference_id: userId.toString(),
     });
 
     return session;
@@ -32,7 +34,7 @@ class StripeService {
 
   async getSessionDetails(sessionId) {
     const session = await this.stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['line_items'],
+      expand: ['line_items', 'customer'],
     });
     return session;
   }

@@ -7,8 +7,10 @@ const router = express.Router();
 const stripeService = new StripeService();
 const paymentController = new PaymentController(stripeService);
 
-router.post('/', paymentController.createCheckoutSession.bind(paymentController));
+const secure = require('../middleware/secure');
 
-router.get('/success', paymentController.handleSuccess.bind(paymentController));
+router.post('/', secure.checkIfVerify, paymentController.createCheckoutSession.bind(paymentController));
+
+router.get('/success', secure.checkIfVerify, paymentController.handleSuccess.bind(paymentController));
 
 module.exports = router;

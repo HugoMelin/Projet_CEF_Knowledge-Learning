@@ -65,6 +65,28 @@ class Purchase {
     }
   }
 
+  static async findByUserAndCourseId(userId, courseId) {
+    try {
+      const [rows] = await db.query('SELECT id_user, id_invoice, id_courses, id_lessons, id_purchases FROM purchases WHERE id_courses = ? and id_user = ?', [courseId, userId]);
+      const result = rows.map((row) => new Purchase(...Object.values(row)));
+      return result[0];
+    } catch (error) {
+      console.error(`Erreur lors de la recherche de la leçon complétée par l'utilisateur: ${error}`);
+      throw error;
+    }
+  }
+
+  static async findByUserAndLessonId(userId, lessonId) {
+    try {
+      const [rows] = await db.query('SELECT id_user, id_invoice, id_courses, id_lessons, id_purchases FROM purchases WHERE id_lessons = ? and id_user = ?', [lessonId, userId]);
+      const result = rows.map((row) => new Purchase(...Object.values(row)));
+      return result[0];
+    } catch (error) {
+      console.error(`Erreur lors de la recherche de la leçon complétée par l'utilisateur: ${error}`);
+      throw error;
+    }
+  }
+
   static async update(purchase) {
     try {
       const [response] = await db.query(`

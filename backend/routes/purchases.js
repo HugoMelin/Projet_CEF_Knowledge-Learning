@@ -3,18 +3,18 @@ const express = require('express');
 const router = express.Router();
 
 const purchaseController = require('../controllers/purchaseController');
-// const secure = require('../middleware/secure');
+const secure = require('../middleware/secure');
 
-router.post('/', purchaseController.createPurchase);
+router.post('/', secure.checkIfVerify, purchaseController.createPurchase);
 
-router.get('/', purchaseController.getAllPurchases);
+router.get('/', secure.checkAdminRole, purchaseController.getAllPurchases);
 
-router.get('/:purchaseId', purchaseController.getPurchaseById);
+router.get('/:purchaseId', secure.checkAdminRole, purchaseController.getPurchaseById);
 
-router.get('/user/:userId', purchaseController.getPurchasesByUserId);
+router.get('/user/:userId', secure.checkUserRole, purchaseController.getPurchasesByUserId);
 
-router.patch('/:purchaseId', purchaseController.updatePurchase);
+router.patch('/:purchaseId', secure.checkAdminRole, purchaseController.updatePurchase);
 
-router.delete('/:purchaseId', purchaseController.deletePurchase);
+router.delete('/:purchaseId', secure.checkAdminRole, purchaseController.deletePurchase);
 
 module.exports = router;
