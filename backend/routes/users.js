@@ -7,13 +7,13 @@ const secure = require('../middleware/secure');
 
 router.post('/', userController.createUser);
 
-// router.get('/', secure.checkAdminRole, userController.getAllUsers);
+router.get('/', secure.checkAdminRole, userController.getAllUsers);
 
-router.get('/:id', secure.checkAdminRole, userController.getOneUserById);
+router.get('/:id', secure.checkJWT, userController.getOneUserById);
 
-router.delete('/:id', userController.deleteUser);
+router.delete('/:id', secure.checkAdminRole, userController.deleteUser);
 
-router.patch('/:id', userController.updateUser);
+router.patch('/:id', secure.checkAdminRole, userController.updateUser);
 
 router.post('/authenticate', userController.authenticate);
 

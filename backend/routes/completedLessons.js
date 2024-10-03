@@ -3,18 +3,18 @@ const express = require('express');
 const router = express.Router();
 
 const completedLessonController = require('../controllers/completedLessonController');
-// const secure = require('../middleware/secure');
+const secure = require('../middleware/secure');
 
-router.post('/', completedLessonController.createCompletedLesson);
+router.post('/', secure.checkUserRole, completedLessonController.createCompletedLesson);
 
-router.get('/', completedLessonController.getAllCompletedLessons);
+router.get('/', secure.checkAdminRole, completedLessonController.getAllCompletedLessons);
 
-router.get('/:userId', completedLessonController.getCompletedLessonsByUserId);
+router.get('/:userId', secure.checkUserRole, completedLessonController.getCompletedLessonsByUserId);
 
-router.get('/:userId/:lessonId', completedLessonController.getCompletedLessonsByUserIdAndLessonsId);
+router.get('/:userId/:lessonId', secure.checkUserRole, completedLessonController.getCompletedLessonsByUserIdAndLessonsId);
 
-router.delete('/:userId/:lessonId', completedLessonController.deleteCompletedLesson);
+router.delete('/:userId/:lessonId', secure.checkAdminRole, completedLessonController.deleteCompletedLesson);
 
-router.patch('/:userId/:lessonId', completedLessonController.updateCompletedLesson);
+router.patch('/:userId/:lessonId', secure.checkAdminRole, completedLessonController.updateCompletedLesson);
 
 module.exports = router;

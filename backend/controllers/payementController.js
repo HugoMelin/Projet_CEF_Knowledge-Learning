@@ -54,7 +54,6 @@ class PaymentController {
         return res.status(400).json({ message: 'Données de ligne invalides' });
       }
 
-      console.log(session.client_reference_id);
       // Création de la facture
       const invoiceData = {
         idUser: session.client_reference_id,

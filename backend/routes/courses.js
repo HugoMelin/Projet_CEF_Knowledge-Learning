@@ -3,16 +3,16 @@ const express = require('express');
 const router = express.Router();
 
 const courseController = require('../controllers/courseController');
-// const secure = require('../middleware/secure');
+const secure = require('../middleware/secure');
 
-router.post('/', courseController.createCourse);
+router.post('/', secure.checkAdminRole, courseController.createCourse);
 
 router.get('/', courseController.getAllCourses);
 
 router.get('/:id', courseController.getOneCourseById);
 
-router.delete('/:id', courseController.deleteCourse);
+router.delete('/:id', secure.checkAdminRole, courseController.deleteCourse);
 
-router.patch('/:id', courseController.updateCourse);
+router.patch('/:id', secure.checkAdminRole, courseController.updateCourse);
 
 module.exports = router;
