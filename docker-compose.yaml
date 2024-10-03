@@ -1,5 +1,19 @@
 services:
-  app:
+  frontend:
+    build: 
+      context: ./frontend
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: ng serve --host 0.0.0.0
+    env_file:
+      - .env
+
+  backend:
     build: 
       context: ./backend
     ports:
