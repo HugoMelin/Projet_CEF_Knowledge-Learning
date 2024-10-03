@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: models/CompletedCourse.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: models/CompletedCourse.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const db = require('../database/database');
+
+/**
+ * Represents a CompletedCourse.
+ * @class
+ */
+class CompletedCourse {
+  /**
+   * Create a CompletedCourse.
+   * @param {number} idUser - The user ID.
+   * @param {number} idCourses - The course ID.
+   * @param {Date} [completedDate=null] - The date the course was completed.
+   */
+  constructor(idUser, idCourses, completedDate = null) {
+    this.idUser = idUser;
+    this.idCourses = idCourses;
+    this.completedDate = completedDate;
+  }
+
+  /**
+   * Create a new completed course record.
+   * @async
+   * @param {Object} courseData - The course data.
+   * @returns {Promise&lt;CompletedCourse>} The created completed course.
+   * @throws {Error} If all lessons in the course are not completed.
+   */
+  static async create(courseData) {
+    try {
+      const allLessonsCompleted = await this
+        .checkAllLessonsCompleted(courseData.idUser, courseData.idCourses);
+      if (!allLessonsCompleted) {
+        throw new Error('Toutes les leçons du cours doivent être complétées avant de marquer le cours comme terminé.');
+      }
+
+      const newCourse = new CompletedCourse(...Object.values(courseData));
+      await db.query(`
+        INSERT INTO completed_courses (id_user, id_courses)
+        VALUES (?, ?)
+      `, [newCourse.idUser, newCourse.idCourses]);
+      return newCourse;
+    } catch (error) {
+      console.error(`Erreur lors de l'enregistrement du cours complété: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Find all completed courses.
+   * @async
+   * @returns {Promise&lt;CompletedCourse[]>} Array of all completed courses.
+   */
+  static async findAll() {
+    try {
+      const [rows] = await db.query('SELECT id_user, id_courses, completed_date FROM completed_courses');
+      return rows.map((row) => new CompletedCourse(...Object.values(row)));
+    } catch (error) {
+      console.error(`Erreur lors de la récupération de tous les cours complétés: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Find completed courses by user ID.
+   * @async
+   * @param {number} userId - The user ID.
+   * @returns {Promise&lt;CompletedCourse[]>} Array of completed courses for the user.
+   */
+  static async findByUserId(userId) {
+    try {
+      const [rows] = await db.query('SELECT id_user, id_courses, completed_date FROM completed_courses WHERE id_user = ?', [userId]);
+      return rows.map((row) => new CompletedCourse(...Object.values(row)));
+    } catch (error) {
+      console.error(`Erreur lors de la recherche des cours complétés par l'utilisateur: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Find a completed course by user ID and course ID.
+   * @async
+   * @param {number} userId - The user ID.
+   * @param {number} coursesId - The course ID.
+   * @returns {Promise&lt;CompletedCourse|null>} The found completed course or null.
+   */
+  static async findByUserAndCoursesId(userId, coursesId) {
+    try {
+      const [rows] = await db.query('SELECT id_user, id_courses, completed_date FROM completed_courses WHERE id_courses = ? and id_user = ?', [coursesId, userId]);
+      return rows.length > 0 ? new CompletedCourse(...Object.values(rows[0])) : null;
+    } catch (error) {
+      console.error(`Erreur lors de la recherche du cours complété par l'utilisateur: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a completed course.
+   * @async
+   * @param {Object} data - The completed course data to delete.
+   * @returns {Promise&lt;Object>} The delete operation response.
+   * @throws {Error} If no completed course was deleted.
+   */
+  static async delete(data) {
+    try {
+      const [response] = await db.query(`
+        DELETE 
+        FROM completed_courses 
+        WHERE id_user = ? AND id_courses = ?
+      `, [data.idUser, data.idCourses]);
+
+      if (response.affectedRows === 0) {
+        throw new Error('Aucun cours complété n\'a été supprimé');
+      }
+
+      return response;
+    } catch (error) {
+      console.error(`Erreur lors de la suppression du cours complété: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Update a completed course.
+   * @async
+   * @param {CompletedCourse} completedCourse - The completed course to update.
+   * @param {Object} dataToUpdate - The data to update.
+   * @returns {Promise&lt;Object>} The update operation response.
+   * @throws {Error} If no completed course was updated.
+   */
+  static async update(completedCourse, dataToUpdate) {
+    try {
+      const { completedDate } = dataToUpdate;
+
+      const [response] = await db.query(`
+        UPDATE completed_courses
+        SET completed_date = COALESCE(?, completed_date)
+        WHERE id_user = ? AND id_courses = ?;
+      `, [completedDate, completedCourse.idUser, completedCourse.idCourses]);
+
+      if (response.affectedRows === 0) {
+        throw new Error('Aucun cours complété n\'a été mise à jour');
+      }
+
+      return response;
+    } catch (error) {
+      console.error(`Erreur lors de la mise à jour du cours complété: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if all lessons in a course are completed by a user.
+   * @async
+   * @param {number} userId - The user ID.
+   * @param {number} coursesId - The course ID.
+   * @returns {Promise&lt;boolean>} True if all lessons are completed, false otherwise.
+   */
+  static async checkAllLessonsCompleted(userId, coursesId) {
+    try {
+      // This query checks if the number of lessons completed for the course is equal
+      // to the total number of lessons in the course.
+      const [response] = await db.query(`
+        SELECT
+          (SELECT COUNT(*)
+          FROM completed_lessons 
+          JOIN lessons ON completed_lessons.id_lessons = lessons.id_lessons
+          WHERE completed_lessons.id_user = ?
+          AND lessons.id_courses = ?) = 
+          (SELECT COUNT(*)
+          FROM lessons 
+          WHERE lessons.id_courses = ?) AS all_completed;
+      `, [userId, coursesId, coursesId]);
+
+      return response[0].all_completed === 1;
+    } catch (error) {
+      console.error(`Erreur lors de la vérification des leçons complétées: ${error}`);
+      throw error;
+    }
+  }
+}
+
+module.exports = CompletedCourse;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Certification.html">Certification</a></li><li><a href="CompletedCourse.html">CompletedCourse</a></li><li><a href="CompletedLesson.html">CompletedLesson</a></li><li><a href="CompletionService.html">CompletionService</a></li><li><a href="Course.html">Course</a></li><li><a href="Invoice.html">Invoice</a></li><li><a href="Lesson.html">Lesson</a></li><li><a href="PaymentController.html">PaymentController</a></li><li><a href="Purchase.html">Purchase</a></li><li><a href="StripeService.html">StripeService</a></li><li><a href="Theme.html">Theme</a></li><li><a href="User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#checkAdminRole">checkAdminRole</a></li><li><a href="global.html#checkAuth">checkAuth</a></li><li><a href="global.html#checkCourseAccess">checkCourseAccess</a></li><li><a href="global.html#checkIfVerify">checkIfVerify</a></li><li><a href="global.html#checkJWT">checkJWT</a></li><li><a href="global.html#checkUserRole">checkUserRole</a></li><li><a href="global.html#createCertification">createCertification</a></li><li><a href="global.html#createCheckoutSession">createCheckoutSession</a></li><li><a href="global.html#createCompletedCourse">createCompletedCourse</a></li><li><a href="global.html#createCompletedLesson">createCompletedLesson</a></li><li><a href="global.html#createCourse">createCourse</a></li><li><a href="global.html#createInvoice">createInvoice</a></li><li><a href="global.html#createLesson">createLesson</a></li><li><a href="global.html#createPurchase">createPurchase</a></li><li><a href="global.html#createTheme">createTheme</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#deleteCertification">deleteCertification</a></li><li><a href="global.html#deleteCompletedCourse">deleteCompletedCourse</a></li><li><a href="global.html#deleteCompletedLesson">deleteCompletedLesson</a></li><li><a href="global.html#deleteCourse">deleteCourse</a></li><li><a href="global.html#deleteInvoice">deleteInvoice</a></li><li><a href="global.html#deleteLesson">deleteLesson</a></li><li><a href="global.html#deletePurchase">deletePurchase</a></li><li><a href="global.html#deleteTheme">deleteTheme</a></li><li><a href="global.html#deleteUser">deleteUser</a></li><li><a href="global.html#generateVerificationToken">generateVerificationToken</a></li><li><a href="global.html#getAllCertifications">getAllCertifications</a></li><li><a href="global.html#getAllCompletedCourses">getAllCompletedCourses</a></li><li><a href="global.html#getAllCompletedLessons">getAllCompletedLessons</a></li><li><a href="global.html#getAllCourses">getAllCourses</a></li><li><a href="global.html#getAllInvoices">getAllInvoices</a></li><li><a href="global.html#getAllLessons">getAllLessons</a></li><li><a href="global.html#getAllPurchases">getAllPurchases</a></li><li><a href="global.html#getAllThemes">getAllThemes</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#getCertificationByUserIdAndThemeId">getCertificationByUserIdAndThemeId</a></li><li><a href="global.html#getCertificationsByUserId">getCertificationsByUserId</a></li><li><a href="global.html#getCompletedCoursesByUserId">getCompletedCoursesByUserId</a></li><li><a href="global.html#getCompletedCoursesByUserIdAndCoursesId">getCompletedCoursesByUserIdAndCoursesId</a></li><li><a href="global.html#getCompletedLessonsByUserId">getCompletedLessonsByUserId</a></li><li><a href="global.html#getCompletedLessonsByUserIdAndLessonsId">getCompletedLessonsByUserIdAndLessonsId</a></li><li><a href="global.html#getInvoiceById">getInvoiceById</a></li><li><a href="global.html#getInvoicesByUserId">getInvoicesByUserId</a></li><li><a href="global.html#getOneCourseById">getOneCourseById</a></li><li><a href="global.html#getOneLessonById">getOneLessonById</a></li><li><a href="global.html#getOneThemeById">getOneThemeById</a></li><li><a href="global.html#getOneUserById">getOneUserById</a></li><li><a href="global.html#getPurchaseById">getPurchaseById</a></li><li><a href="global.html#getPurchasesByUserId">getPurchasesByUserId</a></li><li><a href="global.html#handleSuccess">handleSuccess</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#sendVerificationEmail">sendVerificationEmail</a></li><li><a href="global.html#transporter">transporter</a></li><li><a href="global.html#updateCertification">updateCertification</a></li><li><a href="global.html#updateCompletedCourse">updateCompletedCourse</a></li><li><a href="global.html#updateCompletedLesson">updateCompletedLesson</a></li><li><a href="global.html#updateCourse">updateCourse</a></li><li><a href="global.html#updateInvoice">updateInvoice</a></li><li><a href="global.html#updateLesson">updateLesson</a></li><li><a href="global.html#updatePurchase">updatePurchase</a></li><li><a href="global.html#updateTheme">updateTheme</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#verifyUser">verifyUser</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Oct 03 2024 23:09:14 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

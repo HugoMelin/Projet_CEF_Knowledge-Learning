@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: models/Purchase.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: models/Purchase.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const db = require('../database/database');
+
+/**
+ * Represents a Purchase.
+ * @class
+ */
+class Purchase {
+  /**
+   * Create a Purchase.
+   * @param {number} idUser - The user ID.
+   * @param {number} idInvoice - The invoice ID.
+   * @param {number|null} [idCourses=null] - The course ID (if applicable).
+   * @param {number|null} [idLessons=null] - The lesson ID (if applicable).
+   * @param {number|null} [idPurchases=null] - The purchase ID.
+   */
+  constructor(idUser, idInvoice, idCourses = null, idLessons = null, idPurchases = null) {
+    this.idPurchases = idPurchases;
+    this.idUser = idUser;
+    this.idCourses = idCourses;
+    this.idLessons = idLessons;
+    this.idInvoice = idInvoice;
+  }
+
+  /**
+   * Create a new purchase.
+   * @async
+   * @param {Object} purchaseData - The purchase data.
+   * @returns {Promise&lt;Purchase>} The created purchase.
+   * @throws {Error} If the purchase data is invalid or if there's an error during creation.
+   */
+  static async create(purchaseData) {
+    try {
+      const {
+        idUser,
+        idCourses,
+        idLessons,
+        idInvoice,
+      } = purchaseData;
+
+      if ((idCourses &amp;&amp; idLessons) || (!idCourses &amp;&amp; !idLessons)) {
+        throw new Error('Un achat doit concerner soit un cours, soit une leçon, mais pas les deux ou aucun des deux.');
+      }
+
+      const [response] = await db.query(`
+        INSERT INTO purchases (id_user, id_courses, id_lessons, id_invoice)
+        VALUES (?, ?, ?, ?)
+      `, [idUser, idCourses || null, idLessons || null, idInvoice]);
+
+      return new Purchase(idUser, idInvoice, idCourses, idLessons, response.insertId);
+    } catch (error) {
+      console.error(`Erreur lors de la création de l'achat : ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Find all purchases.
+   * @async
+   * @returns {Promise&lt;Purchase[]>} Array of all purchases.
+   * @throws {Error} If there's an error during retrieval.
+   */
+  static async findAll() {
+    try {
+      const [rows] = await db.query('SELECT id_user, id_invoice, id_courses, id_lessons, id_purchases FROM purchases');
+      return rows.map((row) => new Purchase(...Object.values(row)));
+    } catch (error) {
+      console.error(`Erreur lors de la récupération de tous les achats : ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Find a purchase by ID.
+   * @async
+   * @param {number} purchaseId - The purchase ID.
+   * @returns {Promise&lt;Purchase|null>} The found purchase or null.
+   * @throws {Error} If there's an error during retrieval.
+   */
+  static async findById(purchaseId) {
+    try {
+      const [rows] = await db.query('SELECT id_user, id_invoice, id_courses, id_lessons, id_purchases FROM purchases WHERE id_purchases = ?', [purchaseId]);
+      return rows.length ? new Purchase(...Object.values(rows[0])) : null;
+    } catch (error) {
+      console.error(`Erreur lors de la recherche de l'achat : ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Find purchases by user ID.
+   * @async
+   * @param {number} userId - The user ID.
+   * @returns {Promise&lt;Purchase[]>} Array of purchases for the user.
+   * @throws {Error} If there's an error during retrieval.
+   */
+  static async findByUserId(userId) {
+    try {
+      const [rows] = await db.query('SELECT id_user, id_invoice, id_courses, id_lessons, id_purchases FROM purchases WHERE id_user = ?', [userId]);
+      return rows.map((row) => new Purchase(...Object.values(row)));
+    } catch (error) {
+      console.error(`Erreur lors de la recherche des achats de l'utilisateur : ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Find a purchase by user ID and course ID.
+   * @async
+   * @param {number} userId - The user ID.
+   * @param {number} courseId - The course ID.
+   * @returns {Promise&lt;Purchase|null>} The found purchase or null.
+   * @throws {Error} If there's an error during retrieval.
+   */
+  static async findByUserAndCourseId(userId, courseId) {
+    try {
+      const [rows] = await db.query('SELECT id_user, id_invoice, id_courses, id_lessons, id_purchases FROM purchases WHERE id_courses = ? and id_user = ?', [courseId, userId]);
+      return rows.length ? new Purchase(...Object.values(rows[0])) : null;
+    } catch (error) {
+      console.error(`Erreur lors de la recherche de l'achat du cours par l'utilisateur: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Find a purchase by user ID and lesson ID.
+   * @async
+   * @param {number} userId - The user ID.
+   * @param {number} lessonId - The lesson ID.
+   * @returns {Promise&lt;Purchase|null>} The found purchase or null.
+   * @throws {Error} If there's an error during retrieval.
+   */
+  static async findByUserAndLessonId(userId, lessonId) {
+    try {
+      const [rows] = await db.query('SELECT id_user, id_invoice, id_courses, id_lessons, id_purchases FROM purchases WHERE id_lessons = ? and id_user = ?', [lessonId, userId]);
+      return rows.length ? new Purchase(...Object.values(rows[0])) : null;
+    } catch (error) {
+      console.error(`Erreur lors de la recherche de l'achat de la leçon par l'utilisateur: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Update a purchase.
+   * @async
+   * @param {Purchase} purchase - The purchase to update.
+   * @returns {Promise&lt;Object>} The update operation response.
+   * @throws {Error} If no purchase was updated or if there's an error during update.
+   */
+  static async update(purchase) {
+    try {
+      const [response] = await db.query(`
+        UPDATE purchases
+        SET 
+          id_user = COALESCE(?, id_user),
+          id_courses = COALESCE(?, id_courses),
+          id_lessons = COALESCE(?, id_lessons),
+          id_invoice = COALESCE(?, id_invoice)
+        WHERE id_purchases = ?
+      `, [purchase.idUser, purchase.idCourses, purchase.idLessons, purchase.idInvoice, purchase.idPurchases]);
+
+      if (response.affectedRows === 0) {
+        throw new Error('Aucun achat n\'a été mis à jour');
+      }
+
+      return response;
+    } catch (error) {
+      console.error(`Erreur lors de la mise à jour de l'achat : ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a purchase.
+   * @async
+   * @param {number} purchaseId - The ID of the purchase to delete.
+   * @returns {Promise&lt;Object>} The delete operation response.
+   * @throws {Error} If no purchase was deleted or if there's an error during deletion.
+   */
+  static async delete(purchaseId) {
+    try {
+      const [response] = await db.query(`
+        DELETE 
+        FROM purchases 
+        WHERE id_purchases = ?
+        `, [purchaseId]);
+
+      if (response.affectedRows === 0) {
+        throw new Error('Aucun achat n\'a été supprimé');
+      }
+
+      return response;
+    } catch (error) {
+      console.error(`Erreur lors de la suppression de l'achat : ${error}`);
+      throw error;
+    }
+  }
+}
+
+module.exports = Purchase;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Certification.html">Certification</a></li><li><a href="CompletedCourse.html">CompletedCourse</a></li><li><a href="CompletedLesson.html">CompletedLesson</a></li><li><a href="CompletionService.html">CompletionService</a></li><li><a href="Course.html">Course</a></li><li><a href="Invoice.html">Invoice</a></li><li><a href="Lesson.html">Lesson</a></li><li><a href="PaymentController.html">PaymentController</a></li><li><a href="Purchase.html">Purchase</a></li><li><a href="StripeService.html">StripeService</a></li><li><a href="Theme.html">Theme</a></li><li><a href="User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#checkAdminRole">checkAdminRole</a></li><li><a href="global.html#checkAuth">checkAuth</a></li><li><a href="global.html#checkCourseAccess">checkCourseAccess</a></li><li><a href="global.html#checkIfVerify">checkIfVerify</a></li><li><a href="global.html#checkJWT">checkJWT</a></li><li><a href="global.html#checkUserRole">checkUserRole</a></li><li><a href="global.html#createCertification">createCertification</a></li><li><a href="global.html#createCheckoutSession">createCheckoutSession</a></li><li><a href="global.html#createCompletedCourse">createCompletedCourse</a></li><li><a href="global.html#createCompletedLesson">createCompletedLesson</a></li><li><a href="global.html#createCourse">createCourse</a></li><li><a href="global.html#createInvoice">createInvoice</a></li><li><a href="global.html#createLesson">createLesson</a></li><li><a href="global.html#createPurchase">createPurchase</a></li><li><a href="global.html#createTheme">createTheme</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#deleteCertification">deleteCertification</a></li><li><a href="global.html#deleteCompletedCourse">deleteCompletedCourse</a></li><li><a href="global.html#deleteCompletedLesson">deleteCompletedLesson</a></li><li><a href="global.html#deleteCourse">deleteCourse</a></li><li><a href="global.html#deleteInvoice">deleteInvoice</a></li><li><a href="global.html#deleteLesson">deleteLesson</a></li><li><a href="global.html#deletePurchase">deletePurchase</a></li><li><a href="global.html#deleteTheme">deleteTheme</a></li><li><a href="global.html#deleteUser">deleteUser</a></li><li><a href="global.html#generateVerificationToken">generateVerificationToken</a></li><li><a href="global.html#getAllCertifications">getAllCertifications</a></li><li><a href="global.html#getAllCompletedCourses">getAllCompletedCourses</a></li><li><a href="global.html#getAllCompletedLessons">getAllCompletedLessons</a></li><li><a href="global.html#getAllCourses">getAllCourses</a></li><li><a href="global.html#getAllInvoices">getAllInvoices</a></li><li><a href="global.html#getAllLessons">getAllLessons</a></li><li><a href="global.html#getAllPurchases">getAllPurchases</a></li><li><a href="global.html#getAllThemes">getAllThemes</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#getCertificationByUserIdAndThemeId">getCertificationByUserIdAndThemeId</a></li><li><a href="global.html#getCertificationsByUserId">getCertificationsByUserId</a></li><li><a href="global.html#getCompletedCoursesByUserId">getCompletedCoursesByUserId</a></li><li><a href="global.html#getCompletedCoursesByUserIdAndCoursesId">getCompletedCoursesByUserIdAndCoursesId</a></li><li><a href="global.html#getCompletedLessonsByUserId">getCompletedLessonsByUserId</a></li><li><a href="global.html#getCompletedLessonsByUserIdAndLessonsId">getCompletedLessonsByUserIdAndLessonsId</a></li><li><a href="global.html#getInvoiceById">getInvoiceById</a></li><li><a href="global.html#getInvoicesByUserId">getInvoicesByUserId</a></li><li><a href="global.html#getOneCourseById">getOneCourseById</a></li><li><a href="global.html#getOneLessonById">getOneLessonById</a></li><li><a href="global.html#getOneThemeById">getOneThemeById</a></li><li><a href="global.html#getOneUserById">getOneUserById</a></li><li><a href="global.html#getPurchaseById">getPurchaseById</a></li><li><a href="global.html#getPurchasesByUserId">getPurchasesByUserId</a></li><li><a href="global.html#handleSuccess">handleSuccess</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#sendVerificationEmail">sendVerificationEmail</a></li><li><a href="global.html#transporter">transporter</a></li><li><a href="global.html#updateCertification">updateCertification</a></li><li><a href="global.html#updateCompletedCourse">updateCompletedCourse</a></li><li><a href="global.html#updateCompletedLesson">updateCompletedLesson</a></li><li><a href="global.html#updateCourse">updateCourse</a></li><li><a href="global.html#updateInvoice">updateInvoice</a></li><li><a href="global.html#updateLesson">updateLesson</a></li><li><a href="global.html#updatePurchase">updatePurchase</a></li><li><a href="global.html#updateTheme">updateTheme</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#verifyUser">verifyUser</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Oct 03 2024 23:09:14 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
