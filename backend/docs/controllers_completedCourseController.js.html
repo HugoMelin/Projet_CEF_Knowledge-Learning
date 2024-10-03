@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/completedCourseController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/completedCourseController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const CompletedCourse = require('../models/CompletedCourse');
+
+/**
+ * Creates a new completed course record.
+ * @async
+ * @function createCompletedCourse
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise&lt;void>}
+ */
+exports.createCompletedCourse = async (req, res) => {
+  try {
+    const courseData = req.body;
+    // Validate required fields
+    if (!courseData.idUser || !courseData.idCourses) {
+      return res.status(400).json({ message: 'Veuillez fournir l\'ID de l\'utilisateur et l\'ID du cours' });
+    }
+
+    // Check for existing completed course
+    const existingCompletedCourse = await CompletedCourse
+      .findByUserAndCoursesId(courseData.idUser, courseData.idCourses);
+    if (existingCompletedCourse) {
+      console.error('Cet utilisateur à déjà validé ce cours');
+      return res.status(500).json({ message: 'Cet utilisateur à déjà validé ce cours' });
+    }
+
+    // Create new completed course record
+    const newCompletedCourse = await CompletedCourse.create(courseData);
+    res.status(201).json({ message: 'Cours complété enregistré avec succès.', completedCourse: newCompletedCourse });
+  } catch (error) {
+    console.error(`Erreur lors de l'enregistrement du cours complété: ${error}`);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Retrieves all completed courses.
+ * @async
+ * @function getAllCompletedCourses
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise&lt;void>}
+ */
+exports.getAllCompletedCourses = async (req, res) => {
+  try {
+    const completedCourses = await CompletedCourse.findAll();
+    if (completedCourses.length === 0) {
+      return res.status(404).json({ message: 'Aucun cours complété n\'a été trouvé' });
+    }
+    res.status(200).json(completedCourses);
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des cours complétés: ${error}`);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Retrieves completed courses by user ID.
+ * @async
+ * @function getCompletedCoursesByUserId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise&lt;void>}
+ */
+exports.getCompletedCoursesByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const completedCourses = await CompletedCourse.findByUserId(userId);
+    if (completedCourses.length === 0) {
+      return res.status(404).json({ message: 'Aucun cours complété trouvé pour cet utilisateur' });
+    }
+    res.status(200).json(completedCourses);
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des cours complétés: ${error}`);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Retrieves a completed course by user ID and course ID.
+ * @async
+ * @function getCompletedCoursesByUserIdAndCoursesId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise&lt;void>}
+ */
+exports.getCompletedCoursesByUserIdAndCoursesId = async (req, res) => {
+  try {
+    const { userId, courseId } = req.params;
+    const completedCourses = await CompletedCourse.findByUserAndCoursesId(userId, courseId);
+    if (!completedCourses) {
+      console.error('Cet utilisateur n\'a pas complété ce cours');
+      return res.status(404).json({ message: 'Cet utilisateur n\'a pas complété ce cours' });
+    }
+    res.status(200).json(completedCourses);
+  } catch (error) {
+    console.error(`Erreur lors de la récupération du cours complété: ${error}`);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Deletes a completed course record.
+ * @async
+ * @function deleteCompletedCourse
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise&lt;void>}
+ */
+exports.deleteCompletedCourse = async (req, res) => {
+  try {
+    const { userId, courseId } = req.params;
+    const courseToDelete = await CompletedCourse.findByUserAndCoursesId(userId, courseId);
+    if (courseToDelete) {
+      await CompletedCourse.delete(courseToDelete);
+      res.status(200).json({ message: 'Cours complété supprimé avec succès', courseDeleted: courseToDelete });
+    } else {
+      console.error('Aucun cours complété trouvé pour cet utilisateur et ce cours');
+      res.status(404).json({ message: 'Aucun cours complété trouvé pour cet utilisateur et ce cours' });
+    }
+  } catch (error) {
+    console.error(`Erreur lors de la suppression du cours complété: ${error}`);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Updates a completed course record.
+ * @async
+ * @function updateCompletedCourse
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise&lt;void>}
+ */
+exports.updateCompletedCourse = async (req, res) => {
+  try {
+    const { userId, courseId } = req.params;
+    const courseData = req.body;
+
+    // Check if completedDate is provided
+    if (courseData.completedDate) {
+      const completedCourseToUpdate = await CompletedCourse
+        .findByUserAndCoursesId(userId, courseId);
+      if (completedCourseToUpdate) {
+        await CompletedCourse.update(completedCourseToUpdate, courseData);
+        const updatedCompletedCourse = await CompletedCourse
+          .findByUserAndCoursesId(userId, courseId);
+        res.status(200).json({ message: 'Cours complété mis à jour avec succès', courseUpdated: updatedCompletedCourse });
+      } else {
+        console.error('Aucun cours complété trouvé pour cet utilisateur et ce cours');
+        res.status(404).json({ message: 'Aucun cours complété trouvé pour cet utilisateur et ce cours' });
+      }
+    } else {
+      console.error('Vous devez fournir une nouvelle date de complétion');
+      res.status(400).json({ message: 'Vous devez fournir une nouvelle date de complétion' });
+    }
+  } catch (error) {
+    console.error(`Erreur lors de la modification du cours complété: ${error}`);
+    res.status(500).json({ message: error.message });
+  }
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Certification.html">Certification</a></li><li><a href="CompletedCourse.html">CompletedCourse</a></li><li><a href="CompletedLesson.html">CompletedLesson</a></li><li><a href="CompletionService.html">CompletionService</a></li><li><a href="Course.html">Course</a></li><li><a href="Invoice.html">Invoice</a></li><li><a href="Lesson.html">Lesson</a></li><li><a href="PaymentController.html">PaymentController</a></li><li><a href="Purchase.html">Purchase</a></li><li><a href="StripeService.html">StripeService</a></li><li><a href="Theme.html">Theme</a></li><li><a href="User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#checkAdminRole">checkAdminRole</a></li><li><a href="global.html#checkAuth">checkAuth</a></li><li><a href="global.html#checkCourseAccess">checkCourseAccess</a></li><li><a href="global.html#checkIfVerify">checkIfVerify</a></li><li><a href="global.html#checkJWT">checkJWT</a></li><li><a href="global.html#checkUserRole">checkUserRole</a></li><li><a href="global.html#createCertification">createCertification</a></li><li><a href="global.html#createCheckoutSession">createCheckoutSession</a></li><li><a href="global.html#createCompletedCourse">createCompletedCourse</a></li><li><a href="global.html#createCompletedLesson">createCompletedLesson</a></li><li><a href="global.html#createCourse">createCourse</a></li><li><a href="global.html#createInvoice">createInvoice</a></li><li><a href="global.html#createLesson">createLesson</a></li><li><a href="global.html#createPurchase">createPurchase</a></li><li><a href="global.html#createTheme">createTheme</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#deleteCertification">deleteCertification</a></li><li><a href="global.html#deleteCompletedCourse">deleteCompletedCourse</a></li><li><a href="global.html#deleteCompletedLesson">deleteCompletedLesson</a></li><li><a href="global.html#deleteCourse">deleteCourse</a></li><li><a href="global.html#deleteInvoice">deleteInvoice</a></li><li><a href="global.html#deleteLesson">deleteLesson</a></li><li><a href="global.html#deletePurchase">deletePurchase</a></li><li><a href="global.html#deleteTheme">deleteTheme</a></li><li><a href="global.html#deleteUser">deleteUser</a></li><li><a href="global.html#generateVerificationToken">generateVerificationToken</a></li><li><a href="global.html#getAllCertifications">getAllCertifications</a></li><li><a href="global.html#getAllCompletedCourses">getAllCompletedCourses</a></li><li><a href="global.html#getAllCompletedLessons">getAllCompletedLessons</a></li><li><a href="global.html#getAllCourses">getAllCourses</a></li><li><a href="global.html#getAllInvoices">getAllInvoices</a></li><li><a href="global.html#getAllLessons">getAllLessons</a></li><li><a href="global.html#getAllPurchases">getAllPurchases</a></li><li><a href="global.html#getAllThemes">getAllThemes</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#getCertificationByUserIdAndThemeId">getCertificationByUserIdAndThemeId</a></li><li><a href="global.html#getCertificationsByUserId">getCertificationsByUserId</a></li><li><a href="global.html#getCompletedCoursesByUserId">getCompletedCoursesByUserId</a></li><li><a href="global.html#getCompletedCoursesByUserIdAndCoursesId">getCompletedCoursesByUserIdAndCoursesId</a></li><li><a href="global.html#getCompletedLessonsByUserId">getCompletedLessonsByUserId</a></li><li><a href="global.html#getCompletedLessonsByUserIdAndLessonsId">getCompletedLessonsByUserIdAndLessonsId</a></li><li><a href="global.html#getInvoiceById">getInvoiceById</a></li><li><a href="global.html#getInvoicesByUserId">getInvoicesByUserId</a></li><li><a href="global.html#getOneCourseById">getOneCourseById</a></li><li><a href="global.html#getOneLessonById">getOneLessonById</a></li><li><a href="global.html#getOneThemeById">getOneThemeById</a></li><li><a href="global.html#getOneUserById">getOneUserById</a></li><li><a href="global.html#getPurchaseById">getPurchaseById</a></li><li><a href="global.html#getPurchasesByUserId">getPurchasesByUserId</a></li><li><a href="global.html#handleSuccess">handleSuccess</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#sendVerificationEmail">sendVerificationEmail</a></li><li><a href="global.html#transporter">transporter</a></li><li><a href="global.html#updateCertification">updateCertification</a></li><li><a href="global.html#updateCompletedCourse">updateCompletedCourse</a></li><li><a href="global.html#updateCompletedLesson">updateCompletedLesson</a></li><li><a href="global.html#updateCourse">updateCourse</a></li><li><a href="global.html#updateInvoice">updateInvoice</a></li><li><a href="global.html#updateLesson">updateLesson</a></li><li><a href="global.html#updatePurchase">updatePurchase</a></li><li><a href="global.html#updateTheme">updateTheme</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#verifyUser">verifyUser</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Oct 03 2024 23:09:14 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

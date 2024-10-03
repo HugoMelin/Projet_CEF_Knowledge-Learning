@@ -1,6 +1,18 @@
 const db = require('../database/database');
 
+/**
+ * Represents a Course.
+ * @class
+ */
 class Course {
+  /**
+   * Create a Course.
+   * @param {string} title - The course title.
+   * @param {string} description - The course description.
+   * @param {number} price - The course price.
+   * @param {number} idThemes - The theme ID.
+   * @param {number} [idCourses=null] - The course ID.
+   */
   constructor(title, description, price, idThemes, idCourses = null) {
     this.idCourses = idCourses;
     this.title = title;
@@ -9,11 +21,17 @@ class Course {
     this.idThemes = idThemes;
   }
 
+  /**
+   * Create a new course.
+   * @async
+   * @param {Object} courseData - The course data.
+   * @returns {Promise<Course>} The created course.
+   * @throws {Error} If the course already exists.
+   */
   static async create(courseData) {
     try {
       const existingCourse = await this.findByName(courseData.title);
       if (existingCourse) {
-        console.error('Ce cours existe déjà !');
         throw new Error('Ce cours existe déjà !');
       }
       const newCourse = new Course(...Object.values(courseData));
@@ -30,39 +48,60 @@ class Course {
     }
   }
 
+  /**
+   * Find all courses.
+   * @async
+   * @returns {Promise<Course[]>} Array of all courses.
+   */
   static async findAll() {
     try {
       const [rows] = await db.query('SELECT title, description, price, id_themes, id_courses FROM courses');
-      const result = rows.map((row) => new Course(...Object.values(row)));
-      return result;
+      return rows.map((row) => new Course(...Object.values(row)));
     } catch (error) {
       console.error(`Erreur lors de la récupération de tous les cours: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Find a course by ID.
+   * @async
+   * @param {number} id - The course ID.
+   * @returns {Promise<Course|null>} The found course or null.
+   */
   static async findById(id) {
     try {
       const [rows] = await db.query('SELECT title, description, price, id_themes, id_courses FROM courses WHERE id_courses = ?', [id]);
-      const result = rows.map((row) => new Course(...Object.values(row)));
-      return result[0];
+      return rows.length > 0 ? new Course(...Object.values(rows[0])) : null;
     } catch (error) {
       console.error(`Erreur lors de la recherche d'un cours par ID: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Find a course by name.
+   * @async
+   * @param {string} name - The course name.
+   * @returns {Promise<Course|null>} The found course or null.
+   */
   static async findByName(name) {
     try {
       const [rows] = await db.query('SELECT title, description, price, id_themes, id_courses FROM courses WHERE title = ?', [name]);
-      const result = rows.map((row) => new Course(...Object.values(row)));
-      return result[0];
+      return rows.length > 0 ? new Course(...Object.values(rows[0])) : null;
     } catch (error) {
       console.error(`Erreur lors de la recherche d'un cours par nom: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Delete a course.
+   * @async
+   * @param {Object} data - The course data to delete.
+   * @returns {Promise<Object>} The delete operation response.
+   * @throws {Error} If no course was deleted.
+   */
   static async delete(data) {
     try {
       const [response] = await db.query(`
@@ -72,7 +111,6 @@ class Course {
       `, [data.idCourses]);
 
       if (response.affectedRows === 0) {
-        console.error('Aucun cours n\'a été supprimé');
         throw new Error('Aucun cours n\'a été supprimé');
       }
       return response;
@@ -82,6 +120,14 @@ class Course {
     }
   }
 
+  /**
+   * Update a course.
+   * @async
+   * @param {Course} course - The course to update.
+   * @param {Object} dataToUpdate - The data to update.
+   * @returns {Promise<Object>} The update operation response.
+   * @throws {Error} If no course was updated.
+   */
   static async update(course, dataToUpdate) {
     try {
       const {
@@ -101,7 +147,6 @@ class Course {
       `, [title, description, price, idThemes, course.idCourses]);
 
       if (response.affectedRows === 0) {
-        console.error('Aucun cours n\'a été mis à jour');
         throw new Error('Aucun cours n\'a été mis à jour');
       }
       return response;

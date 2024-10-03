@@ -1,23 +1,36 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-
 const { sendVerificationEmail } = require('../services/emailsService');
 
+/**
+ * Creates a new user.
+ * @async
+ * @function createUser
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.createUser = async (req, res) => {
   try {
     const userData = req.body;
+    // Validate required fields
     if (!userData.email || !userData.password || !userData.username) {
       return res.status(400).json({ message: 'Email, mot de passe et nom d\'utilisateur sont requis' });
     }
 
+    // Check for existing user
     const existingUser = await User.findByEmail(userData.email);
     if (existingUser) {
       console.error('Un utilisateur avec cet email existe déjà !');
-      return res.status(404).json({ message: 'Un utilisateur avec cet email existe déjà !' });
+      return res.status(409).json({ message: 'Un utilisateur avec cet email existe déjà !' });
     }
+
+    // Hash password and create verification token
     userData.password = await bcrypt.hash(userData.password, 10);
     userData.verificationToken = await sendVerificationEmail(userData.email);
+
+    // Create new user
     const newUser = await User.create(userData);
     res.status(201).json({ message: 'Utilisateur créé avec succès.', user: newUser });
   } catch (error) {
@@ -26,12 +39,20 @@ exports.createUser = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves all users.
+ * @async
+ * @function getAllUsers
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll();
     if (users.length === 0) {
       console.error('Aucun utilisateur n\'a été trouvé');
-      res.status(404).json({ message: 'Aucun utilisateur n\'a été trouvé' });
+      return res.status(404).json({ message: 'Aucun utilisateur n\'a été trouvé' });
     }
     res.status(200).json(users);
   } catch (error) {
@@ -40,13 +61,21 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves a single user by ID.
+ * @async
+ * @function getOneUserById
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getOneUserById = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
     if (!user) {
       console.error('Aucun utilisateur trouvé pour cette Id');
-      res.status(404).json({ message: 'Aucun utilisateur trouvé' });
+      return res.status(404).json({ message: 'Aucun utilisateur trouvé' });
     }
     res.status(200).json(user);
   } catch (error) {
@@ -55,6 +84,14 @@ exports.getOneUserById = async (req, res) => {
   }
 };
 
+/**
+ * Deletes a user by ID.
+ * @async
+ * @function deleteUser
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -72,11 +109,20 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+/**
+ * Updates a user by ID.
+ * @async
+ * @function updateUser
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
     const userData = req.body;
 
+    // Hash password if provided
     if (userData.password) {
       userData.password = await bcrypt.hash(userData.password, 10);
     }
@@ -96,6 +142,14 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+/**
+ * Verifies a user's email.
+ * @async
+ * @function verifyUser
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.verifyUser = async (req, res) => {
   try {
     const { token } = req.params;
@@ -110,6 +164,14 @@ exports.verifyUser = async (req, res) => {
   }
 };
 
+/**
+ * Authenticates a user.
+ * @async
+ * @function authenticate
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.authenticate = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -125,13 +187,9 @@ exports.authenticate = async (req, res) => {
 
       const expireIn = 24 * 60 * 60;
       const token = jwt.sign(
-        {
-          user,
-        },
+        { user },
         process.env.SECRET_KEY,
-        {
-          expiresIn: expireIn,
-        },
+        { expiresIn: expireIn },
       );
 
       res.cookie('token', token, {

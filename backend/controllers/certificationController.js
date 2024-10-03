@@ -1,12 +1,22 @@
 const Certification = require('../models/Certification');
 
+/**
+ * Creates a new certification.
+ * @async
+ * @function createCertification
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.createCertification = async (req, res) => {
   try {
     const certificationData = req.body;
+    // Validate required fields
     if (!certificationData.idUser || !certificationData.idThemes) {
       return res.status(400).json({ message: 'Veuillez fournir l\'ID de l\'utilisateur et l\'ID du thème' });
     }
 
+    // Check for existing certification
     const existingCertification = await Certification
       .findByUserAndThemeId(certificationData.idUser, certificationData.idThemes);
     if (existingCertification) {
@@ -14,6 +24,7 @@ exports.createCertification = async (req, res) => {
       return res.status(500).json({ message: 'Cet utilisateur possède déjà cette certification' });
     }
 
+    // Create new certification
     const newCertification = await Certification.create(certificationData);
     res.status(201).json({ message: 'Certification enregistrée avec succès.', certification: newCertification });
   } catch (error) {
@@ -22,6 +33,14 @@ exports.createCertification = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves all certifications.
+ * @async
+ * @function getAllCertifications
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getAllCertifications = async (req, res) => {
   try {
     const certifications = await Certification.findAll();
@@ -35,6 +54,14 @@ exports.getAllCertifications = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves certifications by user ID.
+ * @async
+ * @function getCertificationsByUserId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getCertificationsByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -49,6 +76,14 @@ exports.getCertificationsByUserId = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves a certification by user ID and theme ID.
+ * @async
+ * @function getCertificationByUserIdAndThemeId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getCertificationByUserIdAndThemeId = async (req, res) => {
   try {
     const { userId, themeId } = req.params;
@@ -64,6 +99,14 @@ exports.getCertificationByUserIdAndThemeId = async (req, res) => {
   }
 };
 
+/**
+ * Deletes a certification.
+ * @async
+ * @function deleteCertification
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.deleteCertification = async (req, res) => {
   try {
     const { userId, themeId } = req.params;
@@ -81,11 +124,20 @@ exports.deleteCertification = async (req, res) => {
   }
 };
 
+/**
+ * Updates a certification.
+ * @async
+ * @function updateCertification
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.updateCertification = async (req, res) => {
   try {
     const { userId, themeId } = req.params;
     const certificationData = req.body;
 
+    // Check if obtainedDate is provided
     if (certificationData.obtainedDate) {
       const certificationToUpdate = await Certification.findByUserAndThemeId(userId, themeId);
       if (certificationToUpdate) {

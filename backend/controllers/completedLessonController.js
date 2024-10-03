@@ -1,13 +1,23 @@
 const CompletedLesson = require('../models/CompletedLesson');
 const CompletionService = require('../services/completionService');
 
+/**
+ * Creates a new completed lesson record.
+ * @async
+ * @function createCompletedLesson
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.createCompletedLesson = async (req, res) => {
   try {
     const lessonData = req.body;
+    // Validate required fields
     if (!lessonData.idUser || !lessonData.idLessons) {
       return res.status(400).json({ message: 'Veuillez fournir l\'ID de l\'utilisateur et l\'ID du cours' });
     }
 
+    // Check for existing completed lesson
     const existingCompletedLesson = await CompletedLesson
       .findByUserAndLessonsId(lessonData.idUser, lessonData.idLessons);
     if (existingCompletedLesson) {
@@ -15,7 +25,7 @@ exports.createCompletedLesson = async (req, res) => {
       return res.status(500).json({ message: 'Cet utilisateur à déjà validé cette lesson' });
     }
 
-    // const newCompletedLesson = await CompletedLesson.create(lessonData);
+    // Create new completed lesson record using CompletionService
     const newCompletedLesson = await CompletionService
       .handleLessonCompletion(lessonData.idUser, lessonData.idLessons);
     res.status(201).json({ message: 'Leçon complétée enregistrée avec succès.', completedLesson: newCompletedLesson });
@@ -25,6 +35,14 @@ exports.createCompletedLesson = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves all completed lessons.
+ * @async
+ * @function getAllCompletedLessons
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getAllCompletedLessons = async (req, res) => {
   try {
     const completedLessons = await CompletedLesson.findAll();
@@ -39,6 +57,14 @@ exports.getAllCompletedLessons = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves completed lessons by user ID.
+ * @async
+ * @function getCompletedLessonsByUserId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getCompletedLessonsByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -54,6 +80,14 @@ exports.getCompletedLessonsByUserId = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves a completed lesson by user ID and lesson ID.
+ * @async
+ * @function getCompletedLessonsByUserIdAndLessonsId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getCompletedLessonsByUserIdAndLessonsId = async (req, res) => {
   try {
     const { userId, lessonId } = req.params;
@@ -69,6 +103,14 @@ exports.getCompletedLessonsByUserIdAndLessonsId = async (req, res) => {
   }
 };
 
+/**
+ * Deletes a completed lesson record.
+ * @async
+ * @function deleteCompletedLesson
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.deleteCompletedLesson = async (req, res) => {
   try {
     const { userId, lessonId } = req.params;
@@ -86,11 +128,20 @@ exports.deleteCompletedLesson = async (req, res) => {
   }
 };
 
+/**
+ * Updates a completed lesson record.
+ * @async
+ * @function updateCompletedLesson
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.updateCompletedLesson = async (req, res) => {
   try {
     const { userId, lessonId } = req.params;
     const lessonData = req.body;
 
+    // Check if completedDate is provided
     if (lessonData.completedDate) {
       const completedLessonToUpdate = await CompletedLesson
         .findByUserAndLessonsId(userId, lessonId);

@@ -1,16 +1,31 @@
 const db = require('../database/database');
 
+/**
+ * Represents a Theme.
+ * @class
+ */
 class Theme {
+  /**
+   * Create a Theme.
+   * @param {string} name - The theme name.
+   * @param {number} [idThemes=null] - The theme ID.
+   */
   constructor(name, idThemes = null) {
     this.idThemes = idThemes;
     this.name = name;
   }
 
+  /**
+   * Create a new theme.
+   * @async
+   * @param {Object} themeData - The theme data.
+   * @returns {Promise<Theme>} The created theme.
+   * @throws {Error} If the theme already exists or if there's an error during creation.
+   */
   static async create(themeData) {
     try {
       const existingTheme = await this.findByName(themeData.name);
       if (existingTheme) {
-        console.error('Ce thème existe déjà !');
         throw new Error('Ce thème existe déjà !');
       }
       const newTheme = new Theme(...Object.values(themeData));
@@ -27,39 +42,63 @@ class Theme {
     }
   }
 
+  /**
+   * Find all themes.
+   * @async
+   * @returns {Promise<Theme[]>} Array of all themes.
+   * @throws {Error} If there's an error during retrieval.
+   */
   static async findAll() {
     try {
       const [rows] = await db.query('SELECT name, id_themes FROM themes');
-      const result = rows.map((row) => new Theme(...Object.values(row)));
-      return result;
+      return rows.map((row) => new Theme(...Object.values(row)));
     } catch (error) {
       console.error(`Erreur lors de la récupération de tous les thèmes: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Find a theme by ID.
+   * @async
+   * @param {number} id - The theme ID.
+   * @returns {Promise<Theme|null>} The found theme or null.
+   * @throws {Error} If there's an error during retrieval.
+   */
   static async findById(id) {
     try {
       const [rows] = await db.query('SELECT name, id_themes FROM themes WHERE id_themes = ?', [id]);
-      const result = rows.map((row) => new Theme(...Object.values(row)));
-      return result[0];
+      return rows.length > 0 ? new Theme(...Object.values(rows[0])) : null;
     } catch (error) {
       console.error(`Erreur lors de la recherche d'un thème par ID: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Find a theme by name.
+   * @async
+   * @param {string} name - The theme name.
+   * @returns {Promise<Theme|null>} The found theme or null.
+   * @throws {Error} If there's an error during retrieval.
+   */
   static async findByName(name) {
     try {
       const [rows] = await db.query('SELECT name, id_themes FROM themes WHERE name = ?', [name]);
-      const result = rows.map((row) => new Theme(...Object.values(row)));
-      return result[0];
+      return rows.length > 0 ? new Theme(...Object.values(rows[0])) : null;
     } catch (error) {
-      console.error(`Erreur lors de la recherche d'un thème par nom': ${error}`);
+      console.error(`Erreur lors de la recherche d'un thème par nom: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Delete a theme.
+   * @async
+   * @param {Object} data - The theme data to delete.
+   * @returns {Promise<Object>} The delete operation response.
+   * @throws {Error} If no theme was deleted or if there's an error during deletion.
+   */
   static async delete(data) {
     try {
       const [response] = await db.query(`
@@ -69,7 +108,6 @@ class Theme {
       `, [data.idThemes]);
 
       if (response.affectedRows === 0) {
-        console.error('Aucun thème n\'a été supprimé');
         throw new Error('Aucun thème n\'a été supprimé');
       }
 
@@ -80,11 +118,17 @@ class Theme {
     }
   }
 
+  /**
+   * Update a theme.
+   * @async
+   * @param {Theme} theme - The theme to update.
+   * @param {Object} dataToUpdate - The data to update.
+   * @returns {Promise<Object>} The update operation response.
+   * @throws {Error} If no theme was updated or if there's an error during update.
+   */
   static async update(theme, dataToUpdate) {
     try {
-      const {
-        name,
-      } = dataToUpdate;
+      const { name } = dataToUpdate;
 
       const [response] = await db.query(`
         UPDATE themes 
@@ -94,7 +138,6 @@ class Theme {
         `, [name, theme.idThemes]);
 
       if (response.affectedRows === 0) {
-        console.error('Aucun thème n\'a été mis à jour');
         throw new Error('Aucun thème n\'a été mis à jour');
       }
 
