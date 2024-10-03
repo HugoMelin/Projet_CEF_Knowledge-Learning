@@ -1,18 +1,29 @@
 const Lesson = require('../models/Lesson');
 
+/**
+ * Creates a new lesson.
+ * @async
+ * @function createLesson
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.createLesson = async (req, res) => {
   try {
     const lessonData = req.body;
+    // Validate required fields
     if (!lessonData.title || !lessonData.content || !lessonData.videoUrl || !lessonData.idCourses) {
       return res.status(400).json({ message: 'Veuillez fournir un titre, un contenu et un ID de cours pour la leçon' });
     }
 
+    // Check for existing lesson with the same title
     const existingLesson = await Lesson.findByTitle(lessonData.title);
     if (existingLesson) {
       console.error('Une leçon possède déjà ce titre');
       return res.status(409).json({ message: 'Une leçon possède déjà ce titre' });
     }
 
+    // Create new lesson
     const newLesson = await Lesson.create(lessonData);
     res.status(201).json({ message: 'Leçon créée avec succès.', leçon: newLesson });
   } catch (error) {
@@ -21,6 +32,14 @@ exports.createLesson = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves all lessons.
+ * @async
+ * @function getAllLessons
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getAllLessons = async (req, res) => {
   try {
     const lessons = await Lesson.findAll();
@@ -35,6 +54,14 @@ exports.getAllLessons = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves a single lesson by its ID.
+ * @async
+ * @function getOneLessonById
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getOneLessonById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -50,6 +77,14 @@ exports.getOneLessonById = async (req, res) => {
   }
 };
 
+/**
+ * Deletes a lesson by its ID.
+ * @async
+ * @function deleteLesson
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.deleteLesson = async (req, res) => {
   try {
     const { id } = req.params;
@@ -67,11 +102,20 @@ exports.deleteLesson = async (req, res) => {
   }
 };
 
+/**
+ * Updates a lesson by its ID.
+ * @async
+ * @function updateLesson
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.updateLesson = async (req, res) => {
   try {
     const { id } = req.params;
     const lessonData = req.body;
 
+    // Check if update data is provided
     if (Object.keys(lessonData).length === 0) {
       console.error('Aucune donnée fournie pour la mise à jour');
       return res.status(400).json({ message: 'Aucune donnée fournie pour la mise à jour' });

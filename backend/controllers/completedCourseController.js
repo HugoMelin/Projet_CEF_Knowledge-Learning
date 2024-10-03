@@ -1,12 +1,22 @@
 const CompletedCourse = require('../models/CompletedCourse');
 
+/**
+ * Creates a new completed course record.
+ * @async
+ * @function createCompletedCourse
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.createCompletedCourse = async (req, res) => {
   try {
     const courseData = req.body;
+    // Validate required fields
     if (!courseData.idUser || !courseData.idCourses) {
       return res.status(400).json({ message: 'Veuillez fournir l\'ID de l\'utilisateur et l\'ID du cours' });
     }
 
+    // Check for existing completed course
     const existingCompletedCourse = await CompletedCourse
       .findByUserAndCoursesId(courseData.idUser, courseData.idCourses);
     if (existingCompletedCourse) {
@@ -14,6 +24,7 @@ exports.createCompletedCourse = async (req, res) => {
       return res.status(500).json({ message: 'Cet utilisateur à déjà validé ce cours' });
     }
 
+    // Create new completed course record
     const newCompletedCourse = await CompletedCourse.create(courseData);
     res.status(201).json({ message: 'Cours complété enregistré avec succès.', completedCourse: newCompletedCourse });
   } catch (error) {
@@ -22,6 +33,14 @@ exports.createCompletedCourse = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves all completed courses.
+ * @async
+ * @function getAllCompletedCourses
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getAllCompletedCourses = async (req, res) => {
   try {
     const completedCourses = await CompletedCourse.findAll();
@@ -35,6 +54,14 @@ exports.getAllCompletedCourses = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves completed courses by user ID.
+ * @async
+ * @function getCompletedCoursesByUserId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getCompletedCoursesByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -49,6 +76,14 @@ exports.getCompletedCoursesByUserId = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves a completed course by user ID and course ID.
+ * @async
+ * @function getCompletedCoursesByUserIdAndCoursesId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getCompletedCoursesByUserIdAndCoursesId = async (req, res) => {
   try {
     const { userId, courseId } = req.params;
@@ -64,6 +99,14 @@ exports.getCompletedCoursesByUserIdAndCoursesId = async (req, res) => {
   }
 };
 
+/**
+ * Deletes a completed course record.
+ * @async
+ * @function deleteCompletedCourse
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.deleteCompletedCourse = async (req, res) => {
   try {
     const { userId, courseId } = req.params;
@@ -81,11 +124,20 @@ exports.deleteCompletedCourse = async (req, res) => {
   }
 };
 
+/**
+ * Updates a completed course record.
+ * @async
+ * @function updateCompletedCourse
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.updateCompletedCourse = async (req, res) => {
   try {
     const { userId, courseId } = req.params;
     const courseData = req.body;
 
+    // Check if completedDate is provided
     if (courseData.completedDate) {
       const completedCourseToUpdate = await CompletedCourse
         .findByUserAndCoursesId(userId, courseId);

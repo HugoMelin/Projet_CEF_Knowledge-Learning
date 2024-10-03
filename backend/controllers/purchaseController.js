@@ -1,14 +1,24 @@
 const Purchase = require('../models/Purchase');
 
+/**
+ * Creates a new purchase.
+ * @async
+ * @function createPurchase
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.createPurchase = async (req, res) => {
   try {
     const purchaseData = req.body;
+    // Validate required fields
     if (!purchaseData.idUser
       || !purchaseData.idInvoice
       || (!purchaseData.idCourses && !purchaseData.idLessons)) {
       return res.status(400).json({ message: 'Veuillez fournir l\'ID de l\'utilisateur, l\'ID de la facture, et soit l\'ID du cours, soit l\'ID de la leçon' });
     }
 
+    // Ensure purchase is for either a course or a lesson, not both
     if (purchaseData.idCourses && purchaseData.idLessons) {
       return res.status(400).json({ message: 'Un achat ne peut concerner qu\'un cours ou une leçon, pas les deux' });
     }
@@ -22,6 +32,14 @@ exports.createPurchase = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves all purchases.
+ * @async
+ * @function getAllPurchases
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getAllPurchases = async (req, res) => {
   try {
     const purchases = await Purchase.findAll();
@@ -35,6 +53,14 @@ exports.getAllPurchases = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves a purchase by its ID.
+ * @async
+ * @function getPurchaseById
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getPurchaseById = async (req, res) => {
   try {
     const { purchaseId } = req.params;
@@ -49,6 +75,14 @@ exports.getPurchaseById = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves purchases by user ID.
+ * @async
+ * @function getPurchasesByUserId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getPurchasesByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -63,6 +97,14 @@ exports.getPurchasesByUserId = async (req, res) => {
   }
 };
 
+/**
+ * Updates a purchase.
+ * @async
+ * @function updatePurchase
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.updatePurchase = async (req, res) => {
   try {
     const { purchaseId } = req.params;
@@ -84,6 +126,14 @@ exports.updatePurchase = async (req, res) => {
   }
 };
 
+/**
+ * Deletes a purchase.
+ * @async
+ * @function deletePurchase
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.deletePurchase = async (req, res) => {
   try {
     const { purchaseId } = req.params;

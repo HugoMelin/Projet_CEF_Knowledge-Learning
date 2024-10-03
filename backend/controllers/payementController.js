@@ -1,17 +1,33 @@
 const jwt = require('jsonwebtoken');
-
 const Invoice = require('../models/Invoice');
 const Purchase = require('../models/Purchase');
 
 const { SECRET_KEY } = process.env;
 
+/**
+ * Controller for handling payment-related operations.
+ * @class
+ */
 class PaymentController {
+  /**
+   * Create a PaymentController.
+   * @param {Object} stripeService - The Stripe service for payment processing.
+   */
   constructor(stripeService) {
     this.stripeService = stripeService;
   }
 
+  /**
+   * Creates a checkout session.
+   * @async
+   * @function createCheckoutSession
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   * @returns {Promise<void>}
+   */
   async createCheckoutSession(req, res) {
     try {
+      // Extract and verify JWT token
       let token = req.cookies.token || req.headers.authorization;
       if (token && token.startsWith('Bearer ')) {
         token = token.slice(7);
@@ -26,6 +42,7 @@ class PaymentController {
 
       const { idUser } = req.user;
 
+      // Create checkout session
       const { items } = req.body;
       const session = await this.stripeService.createCheckoutSession(
         items,
@@ -40,9 +57,16 @@ class PaymentController {
     }
   }
 
+  /**
+   * Handles successful checkout.
+   * @async
+   * @function handleSuccess
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   * @returns {Promise<void>}
+   */
   async handleSuccess(req, res) {
     try {
-      // eslint-disable-next-line camelcase
       const { session_id } = req.query;
       const session = await this.stripeService.getSessionDetails(session_id);
 
@@ -54,14 +78,14 @@ class PaymentController {
         return res.status(400).json({ message: 'Données de ligne invalides' });
       }
 
-      // Création de la facture
+      // Create invoice
       const invoiceData = {
         idUser: session.client_reference_id,
         price: session.amount_total / 100,
       };
       const newInvoice = await Invoice.create(invoiceData);
 
-      // Créer les achats
+      // Create purchases
       await Promise.all(session.line_items.data.map(async (item) => {
         const productData = await this.stripeService.getProductDetails(item.price.product);
 
@@ -75,7 +99,7 @@ class PaymentController {
         return Purchase.create(purchaseData);
       }));
 
-      res.redirect('/success-page'); // Redirigez vers une page de succès
+      res.redirect('/success-page'); // Redirect to success page
     } catch (error) {
       console.error('Erreur détaillée:', error);
       if (error instanceof jwt.JsonWebTokenError) {

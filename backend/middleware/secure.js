@@ -1,10 +1,15 @@
 const jwt = require('jsonwebtoken');
-
 const Lesson = require('../models/Lesson');
 const Purchase = require('../models/Purchase');
 
 const { SECRET_KEY } = process.env;
 
+/**
+ * Creates an authentication middleware.
+ * @function
+ * @param {Function} verificationFn - Function to verify user permissions.
+ * @returns {Function} Express middleware function.
+ */
 const checkAuth = (verificationFn) => async (req, res, next) => {
   let token = req.cookies.token || req.headers.authorization;
   if (token && token.startsWith('Bearer ')) {
@@ -25,7 +30,7 @@ const checkAuth = (verificationFn) => async (req, res, next) => {
       return res.status(403).json({ message: 'Accès refusé' });
     }
 
-    // Renouvellement du token
+    // Token renewal
     const expiresIn = 24 * 60 * 60;
     const newToken = jwt.sign(
       { user: req.user },
@@ -54,11 +59,39 @@ const checkAuth = (verificationFn) => async (req, res, next) => {
   }
 };
 
+/**
+ * Middleware to check if JWT is valid.
+ * @type {Function}
+ */
 exports.checkJWT = checkAuth((user) => user);
+
+/**
+ * Middleware to check if user has admin role.
+ * @type {Function}
+ */
 exports.checkAdminRole = checkAuth((user) => user.role.includes('role-admin'));
+
+/**
+ * Middleware to check if user has user role.
+ * @type {Function}
+ */
 exports.checkUserRole = checkAuth((user) => user.role.includes('role-user'));
+
+/**
+ * Middleware to check if user is verified.
+ * @type {Function}
+ */
 exports.checkIfVerify = checkAuth((user) => user.isVerified === 1);
 
+/**
+ * Middleware to check course access.
+ * @async
+ * @function checkCourseAccess
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @returns {Promise<void>}
+ */
 exports.checkCourseAccess = async (req, res, next) => {
   let token = req.cookies.token || req.headers.authorization;
   if (token && token.startsWith('Bearer ')) {
@@ -89,6 +122,7 @@ exports.checkCourseAccess = async (req, res, next) => {
       }
     }
 
+    // Token renewal
     const expiresIn = 24 * 60 * 60;
     const newToken = jwt.sign(
       { user: req.user },

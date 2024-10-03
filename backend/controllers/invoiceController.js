@@ -1,8 +1,17 @@
 const Invoice = require('../models/Invoice');
 
+/**
+ * Creates a new invoice.
+ * @async
+ * @function createInvoice
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.createInvoice = async (req, res) => {
   try {
     const invoiceData = req.body;
+    // Validate required fields
     if (!invoiceData.price || !invoiceData.idUser) {
       return res.status(400).json({ message: 'Veuillez fournir le prix et l\'ID de l\'utilisateur' });
     }
@@ -16,6 +25,14 @@ exports.createInvoice = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves all invoices.
+ * @async
+ * @function getAllInvoices
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getAllInvoices = async (req, res) => {
   try {
     const invoices = await Invoice.findAll();
@@ -29,6 +46,14 @@ exports.getAllInvoices = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves an invoice by its ID.
+ * @async
+ * @function getInvoiceById
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getInvoiceById = async (req, res) => {
   try {
     const { invoiceId } = req.params;
@@ -43,6 +68,14 @@ exports.getInvoiceById = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves invoices by user ID.
+ * @async
+ * @function getInvoicesByUserId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.getInvoicesByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -57,6 +90,14 @@ exports.getInvoicesByUserId = async (req, res) => {
   }
 };
 
+/**
+ * Updates an invoice.
+ * @async
+ * @function updateInvoice
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.updateInvoice = async (req, res) => {
   try {
     const { invoiceId } = req.params;
@@ -78,6 +119,14 @@ exports.updateInvoice = async (req, res) => {
   }
 };
 
+/**
+ * Deletes an invoice.
+ * @async
+ * @function deleteInvoice
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
 exports.deleteInvoice = async (req, res) => {
   try {
     const { invoiceId } = req.params;

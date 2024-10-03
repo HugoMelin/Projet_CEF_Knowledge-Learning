@@ -1,12 +1,29 @@
 const db = require('../database/database');
 
+/**
+ * Represents an Invoice.
+ * @class
+ */
 class Invoice {
+  /**
+   * Create an Invoice.
+   * @param {number} idUser - The user ID.
+   * @param {number} price - The invoice price.
+   * @param {number} [idInvoice=null] - The invoice ID.
+   */
   constructor(idUser, price, idInvoice = null) {
     this.idInvoice = idInvoice;
     this.idUser = idUser;
     this.price = price;
   }
 
+  /**
+   * Create a new invoice.
+   * @async
+   * @param {Object} invoiceData - The invoice data.
+   * @returns {Promise<Invoice>} The created invoice.
+   * @throws {Error} If there's an error during creation.
+   */
   static async create(invoiceData) {
     try {
       const newInvoice = new Invoice(...Object.values(invoiceData));
@@ -22,6 +39,12 @@ class Invoice {
     }
   }
 
+  /**
+   * Find all invoices.
+   * @async
+   * @returns {Promise<Invoice[]>} Array of all invoices.
+   * @throws {Error} If there's an error during retrieval.
+   */
   static async findAll() {
     try {
       const [rows] = await db.query('SELECT id_user, price, id_invoice FROM invoices');
@@ -32,6 +55,13 @@ class Invoice {
     }
   }
 
+  /**
+   * Find an invoice by ID.
+   * @async
+   * @param {number} invoiceId - The invoice ID.
+   * @returns {Promise<Invoice|null>} The found invoice or null.
+   * @throws {Error} If there's an error during retrieval.
+   */
   static async findById(invoiceId) {
     try {
       const [rows] = await db.query('SELECT id_user, price, id_invoice FROM invoices WHERE id_invoice = ?', [invoiceId]);
@@ -42,6 +72,13 @@ class Invoice {
     }
   }
 
+  /**
+   * Find invoices by user ID.
+   * @async
+   * @param {number} userId - The user ID.
+   * @returns {Promise<Invoice[]>} Array of invoices for the user.
+   * @throws {Error} If there's an error during retrieval.
+   */
   static async findByUserId(userId) {
     try {
       const [rows] = await db.query('SELECT id_user, price, id_invoice FROM invoices WHERE id_user = ?', [userId]);
@@ -52,6 +89,13 @@ class Invoice {
     }
   }
 
+  /**
+   * Update an invoice.
+   * @async
+   * @param {Invoice} invoice - The invoice to update.
+   * @returns {Promise<Object>} The update operation response.
+   * @throws {Error} If no invoice was updated or there's an error during update.
+   */
   static async update(invoice) {
     try {
       const [response] = await db.query(`
@@ -71,6 +115,13 @@ class Invoice {
     }
   }
 
+  /**
+   * Delete an invoice.
+   * @async
+   * @param {number} invoiceId - The ID of the invoice to delete.
+   * @returns {Promise<Object>} The delete operation response.
+   * @throws {Error} If no invoice was deleted or there's an error during deletion.
+   */
   static async delete(invoiceId) {
     try {
       const [response] = await db.query(`

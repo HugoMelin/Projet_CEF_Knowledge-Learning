@@ -1,15 +1,31 @@
 const db = require('../database/database');
 
+/**
+ * Represents a CompletedCourse.
+ * @class
+ */
 class CompletedCourse {
+  /**
+   * Create a CompletedCourse.
+   * @param {number} idUser - The user ID.
+   * @param {number} idCourses - The course ID.
+   * @param {Date} [completedDate=null] - The date the course was completed.
+   */
   constructor(idUser, idCourses, completedDate = null) {
     this.idUser = idUser;
     this.idCourses = idCourses;
     this.completedDate = completedDate;
   }
 
+  /**
+   * Create a new completed course record.
+   * @async
+   * @param {Object} courseData - The course data.
+   * @returns {Promise<CompletedCourse>} The created completed course.
+   * @throws {Error} If all lessons in the course are not completed.
+   */
   static async create(courseData) {
     try {
-      // Check if all lessons in the course are completed
       const allLessonsCompleted = await this
         .checkAllLessonsCompleted(courseData.idUser, courseData.idCourses);
       if (!allLessonsCompleted) {
@@ -28,39 +44,61 @@ class CompletedCourse {
     }
   }
 
+  /**
+   * Find all completed courses.
+   * @async
+   * @returns {Promise<CompletedCourse[]>} Array of all completed courses.
+   */
   static async findAll() {
     try {
       const [rows] = await db.query('SELECT id_user, id_courses, completed_date FROM completed_courses');
-      const result = rows.map((row) => new CompletedCourse(...Object.values(row)));
-      return result;
+      return rows.map((row) => new CompletedCourse(...Object.values(row)));
     } catch (error) {
       console.error(`Erreur lors de la récupération de tous les cours complétés: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Find completed courses by user ID.
+   * @async
+   * @param {number} userId - The user ID.
+   * @returns {Promise<CompletedCourse[]>} Array of completed courses for the user.
+   */
   static async findByUserId(userId) {
     try {
       const [rows] = await db.query('SELECT id_user, id_courses, completed_date FROM completed_courses WHERE id_user = ?', [userId]);
-      const result = rows.map((row) => new CompletedCourse(...Object.values(row)));
-      return result;
+      return rows.map((row) => new CompletedCourse(...Object.values(row)));
     } catch (error) {
       console.error(`Erreur lors de la recherche des cours complétés par l'utilisateur: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Find a completed course by user ID and course ID.
+   * @async
+   * @param {number} userId - The user ID.
+   * @param {number} coursesId - The course ID.
+   * @returns {Promise<CompletedCourse|null>} The found completed course or null.
+   */
   static async findByUserAndCoursesId(userId, coursesId) {
     try {
       const [rows] = await db.query('SELECT id_user, id_courses, completed_date FROM completed_courses WHERE id_courses = ? and id_user = ?', [coursesId, userId]);
-      const result = rows.map((row) => new CompletedCourse(...Object.values(row)));
-      return result[0];
+      return rows.length > 0 ? new CompletedCourse(...Object.values(rows[0])) : null;
     } catch (error) {
       console.error(`Erreur lors de la recherche du cours complété par l'utilisateur: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Delete a completed course.
+   * @async
+   * @param {Object} data - The completed course data to delete.
+   * @returns {Promise<Object>} The delete operation response.
+   * @throws {Error} If no completed course was deleted.
+   */
   static async delete(data) {
     try {
       const [response] = await db.query(`
@@ -80,6 +118,14 @@ class CompletedCourse {
     }
   }
 
+  /**
+   * Update a completed course.
+   * @async
+   * @param {CompletedCourse} completedCourse - The completed course to update.
+   * @param {Object} dataToUpdate - The data to update.
+   * @returns {Promise<Object>} The update operation response.
+   * @throws {Error} If no completed course was updated.
+   */
   static async update(completedCourse, dataToUpdate) {
     try {
       const { completedDate } = dataToUpdate;
@@ -91,7 +137,6 @@ class CompletedCourse {
       `, [completedDate, completedCourse.idUser, completedCourse.idCourses]);
 
       if (response.affectedRows === 0) {
-        console.error('Aucun cours complété n\'a été mise à jour');
         throw new Error('Aucun cours complété n\'a été mise à jour');
       }
 
@@ -102,6 +147,13 @@ class CompletedCourse {
     }
   }
 
+  /**
+   * Check if all lessons in a course are completed by a user.
+   * @async
+   * @param {number} userId - The user ID.
+   * @param {number} coursesId - The course ID.
+   * @returns {Promise<boolean>} True if all lessons are completed, false otherwise.
+   */
   static async checkAllLessonsCompleted(userId, coursesId) {
     try {
       // This query checks if the number of lessons completed for the course is equal

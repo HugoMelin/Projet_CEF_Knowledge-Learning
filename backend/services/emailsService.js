@@ -1,15 +1,24 @@
 const crypto = require('crypto');
-
 const transporter = require('../config/email');
 
-exports.generateVerificationToken = () => {
-  const randomToken = crypto.randomBytes(32).toString('hex');
-  return randomToken;
-};
+/**
+ * Generates a random verification token.
+ * @function generateVerificationToken
+ * @returns {string} A random 32-byte hex string.
+ */
+exports.generateVerificationToken = () => crypto.randomBytes(32).toString('hex');
 
+/**
+ * Sends a verification email to the user.
+ * @async
+ * @function sendVerificationEmail
+ * @param {string} email - The recipient's email address.
+ * @returns {Promise<string>} The verification token.
+ * @throws {Error} If there's an error sending the email.
+ */
 exports.sendVerificationEmail = async (email) => {
   try {
-    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationToken = exports.generateVerificationToken();
     const verificationLink = `${process.env.API_URL}verify/${verificationToken}`;
 
     await transporter.sendMail({
@@ -21,7 +30,6 @@ exports.sendVerificationEmail = async (email) => {
 
     return verificationToken;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Erreur lors de l\'envoi de l\'email:', error);
     throw error;
   }

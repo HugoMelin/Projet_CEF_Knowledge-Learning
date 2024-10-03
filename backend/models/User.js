@@ -1,6 +1,20 @@
 const db = require('../database/database');
 
+/**
+ * Represents a User.
+ * @class
+ */
 class User {
+  /**
+   * Create a User.
+   * @param {string} username - The user's username.
+   * @param {string} email - The user's email.
+   * @param {string} password - The user's hashed password.
+   * @param {string|null} [verificationToken=null] - The user's verification token.
+   * @param {string} [role="['role-user']"] - The user's role.
+   * @param {number} [isVerified=0] - Whether the user is verified.
+   * @param {number|null} [idUser=null] - The user's ID.
+   */
   constructor(username, email, password, verificationToken = null, role = "['role-user']", isVerified = 0, idUser = null) {
     this.idUser = idUser;
     this.username = username;
@@ -11,11 +25,17 @@ class User {
     this.verificationToken = verificationToken;
   }
 
+  /**
+   * Create a new user.
+   * @async
+   * @param {Object} userData - The user data.
+   * @returns {Promise<User>} The created user.
+   * @throws {Error} If the user already exists or if there's an error during creation.
+   */
   static async create(userData) {
     try {
       const existingUser = await this.findByEmail(userData.email);
       if (existingUser) {
-        console.error('Un utilisateur avec cet email existe déjà !');
         throw new Error('Un utilisateur avec cet email existe déjà !');
       }
       const newUser = new User(...Object.values(userData));
@@ -32,39 +52,63 @@ class User {
     }
   }
 
+  /**
+   * Find all users.
+   * @async
+   * @returns {Promise<User[]>} Array of all users.
+   * @throws {Error} If there's an error during retrieval.
+   */
   static async findAll() {
     try {
       const [rows] = await db.query('SELECT username, email, password, verification_token, role, is_verified, id_user FROM users');
-      const result = rows.map((row) => new User(...Object.values(row)));
-      return result;
+      return rows.map((row) => new User(...Object.values(row)));
     } catch (error) {
       console.error(`Erreur lors de la récupération de tous les utilisateurs: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Find a user by ID.
+   * @async
+   * @param {number} id - The user ID.
+   * @returns {Promise<User|null>} The found user or null.
+   * @throws {Error} If there's an error during retrieval.
+   */
   static async findById(id) {
     try {
       const [rows] = await db.query('SELECT username, email, password, verification_token, role, is_verified, id_user FROM users WHERE id_user = ?', [id]);
-      const result = rows.map((row) => new User(...Object.values(row)));
-      return result[0];
+      return rows.length > 0 ? new User(...Object.values(rows[0])) : null;
     } catch (error) {
       console.error(`Erreur lors de la recherche de l'utilisateur par ID: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Find a user by email.
+   * @async
+   * @param {string} email - The user's email.
+   * @returns {Promise<User|null>} The found user or null.
+   * @throws {Error} If there's an error during retrieval.
+   */
   static async findByEmail(email) {
     try {
       const [rows] = await db.query('SELECT username, email, password, verification_token, role, is_verified, id_user FROM users WHERE email = ?', [email]);
-      const result = rows.map((row) => new User(...Object.values(row)));
-      return result[0];
+      return rows.length > 0 ? new User(...Object.values(rows[0])) : null;
     } catch (error) {
       console.error(`Erreur lors de la recherche de l'utilisateur par email: ${error}`);
       throw error;
     }
   }
 
+  /**
+   * Delete a user.
+   * @async
+   * @param {Object} userData - The user data to delete.
+   * @returns {Promise<Object>} The delete operation response.
+   * @throws {Error} If no user was deleted or if there's an error during deletion.
+   */
   static async delete(userData) {
     try {
       const [response] = await db.query(`
@@ -74,7 +118,6 @@ class User {
       `, [userData.idUser]);
 
       if (response.affectedRows === 0) {
-        console.error('Aucun utilisateur n\'a été supprimé');
         throw new Error('Aucun utilisateur n\'a été supprimé');
       }
 
@@ -85,6 +128,14 @@ class User {
     }
   }
 
+  /**
+   * Update a user.
+   * @async
+   * @param {User} user - The user to update.
+   * @param {Object} dataToUpdate - The data to update.
+   * @returns {Promise<Object>} The update operation response.
+   * @throws {Error} If no user was updated or if there's an error during update.
+   */
   static async update(user, dataToUpdate) {
     try {
       const {
@@ -107,7 +158,6 @@ class User {
         `, [username, email, password, role, isVerified, user.idUser]);
 
       if (response.affectedRows === 0) {
-        console.error('Aucun utilisateur n\'a été mis à jour');
         throw new Error('Aucun utilisateur n\'a été mis à jour');
       }
 
@@ -118,9 +168,15 @@ class User {
     }
   }
 
+  /**
+   * Verify a user's account.
+   * @async
+   * @param {string} token - The verification token.
+   * @returns {Promise<Object>} The verification result.
+   * @throws {Error} If the token is invalid or if there's an error during verification.
+   */
   static async verifyUser(token) {
     try {
-      // Étape 1 : On recherche l'utilisateur avec le token de vérification
       const [users] = await db.query(`
           SELECT id_user
           FROM users
@@ -129,13 +185,11 @@ class User {
         `, [token]);
 
       if (users.length === 0) {
-        console.error('Token de vérification invalide ou déjà utilisé');
         throw new Error('Token de vérification invalide ou déjà utilisé');
       }
 
       const userId = users[0].id_user;
 
-      // Étape 2 : On marque l'utilisateur comme vérifié
       const [response] = await db.query(`
           UPDATE users
           SET is_verified = true,
@@ -144,7 +198,6 @@ class User {
         `, [userId]);
 
       if (response.affectedRows === 0) {
-        console.error('Échec de la vérification du compte');
         throw new Error('Échec de la vérification du compte');
       }
 
