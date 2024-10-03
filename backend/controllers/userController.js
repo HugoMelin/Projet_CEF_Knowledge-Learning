@@ -1,7 +1,23 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const PasswordValidator = require('password-validator');
 const { sendVerificationEmail } = require('../services/emailsService');
+
+const validatePassword = (password) => {
+  const schema = new PasswordValidator();
+
+  schema
+    .is().min(8)
+    .is().max(100)
+    .has().uppercase()
+    .has().lowercase()
+    .has().digits(2)
+    .has().not().spaces()
+    .is().not().oneOf(['Passw0rd', 'Password123']);
+
+  return schema.validate(password);
+};
 
 /**
  * Creates a new user.
@@ -17,6 +33,10 @@ exports.createUser = async (req, res) => {
     // Validate required fields
     if (!userData.email || !userData.password || !userData.username) {
       return res.status(400).json({ message: 'Email, mot de passe et nom d\'utilisateur sont requis' });
+    }
+
+    if (!validatePassword(userData.password)) {
+      return res.status(400).json({ error: 'Le mot de passe ne respecte pas les critères de sécurité' });
     }
 
     // Check for existing user
@@ -121,6 +141,10 @@ exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
     const userData = req.body;
+
+    if (!validatePassword(userData.password)) {
+      return res.status(400).json({ error: 'Le mot de passe ne respecte pas les critères de sécurité' });
+    }
 
     // Hash password if provided
     if (userData.password) {
