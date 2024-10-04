@@ -5,7 +5,7 @@
     </div>
     <div class="card-body">
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <div class="d-flex flex-column align-items-center mb-5">
+        <div class="d-flex flex-column align-items-center mb-4">
           <label for="email">Email</label>
           <input class="w-50" type="email" id="email" formControlName="email" required>
           <div *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)">
@@ -14,7 +14,7 @@
           </div>
         </div>
 
-        <div class="d-flex flex-column align-items-center mb-4">
+        <div class="d-flex flex-column align-items-center mb-5">
           <label for="password">Mot de passe</label>
           <input class="w-50" type="password" id="password" formControlName="password" required>
           <div *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)">
@@ -35,6 +35,12 @@
       <div NgIf="errorMessage" class="text-danger text-center mt-2">
         {{ errorMessage }}
       </div>
+
+      <div class="text-center mt-3">
+        <p class="mb-0">Vous n'avez pas de compte ? <a routerLink="/creer-un-compte" class="text-black-50 fw-bold">S'inscrire</a>
+        </p>
+      </div>
+
     </div>
   </div>
 </div>
