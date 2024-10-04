@@ -12,6 +12,7 @@ export class AuthService {
   public currentUser: Observable<any>;
 
   constructor(private http: HttpClient) {
+    // Initializing with stored user data to maintain session across page reloads
     this.currentUserSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('currentUser') || '{}'));
     this.currentUser = this.currentUserSubject.asObservable();
   }
@@ -23,7 +24,7 @@ export class AuthService {
   login(email: string, password: string): Observable<any> {
     return this.http.post<any>(`${environment.API_URL}/users/authenticate`, { email, password })
       .pipe(map(user => {
-        // stores user details and JWT token in local storage to keep user logged in between page refreshes
+        // Persist user session and notify subscribers of the new authentication state
         localStorage.setItem('currentUser', JSON.stringify(user));
         this.currentUserSubject.next(user);
         return user;
@@ -31,35 +32,19 @@ export class AuthService {
   }
 
   logout() {
-    // supprime l'utilisateur du stockage local pour le déconnecter
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
   }
 
   register(user: any): Observable<any> {
-    return this.http.post(`${environment.API_URL}/auth/register`, user);
+    return this.http.post(`${environment.API_URL}/users`, user);
   }
 
-  // Méthode pour vérifier si l'utilisateur est connecté
   isLoggedIn(): boolean {
     return !!this.currentUserValue;
   }
 
-  // Méthode pour obtenir le token JWT
   getToken(): string | null {
     return this.currentUserValue ? this.currentUserValue.token : null;
-  }
-
-  // Méthode pour rafraîchir le token (si votre API le supporte)
-  refreshToken(): Observable<any> {
-    return this.http.post<any>(`${environment.API_URL}/auth/refresh-token`, {
-      'refreshToken': this.currentUserValue.refreshToken
-    }).pipe(map((user) => {
-      if (user && user.token) {
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        this.currentUserSubject.next(user);
-      }
-      return user;
-    }));
   }
 }
