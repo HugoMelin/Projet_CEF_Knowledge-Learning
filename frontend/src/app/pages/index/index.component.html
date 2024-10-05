@@ -1,3 +1,8 @@
 <div class="container">
+  <div *ngIf="errorMessage" class="error-popup bg-danger d-flex gap-3 align-items-center p-3 rounded">
+    <p class="text-light my-auto">{{ errorMessage }}</p>
+    <button class="btn btn-light" (click)="closeErrorPopup()">Fermer</button>
+  </div>
+
   <app-theme-card />
 </div>

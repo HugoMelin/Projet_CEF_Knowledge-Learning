@@ -4,6 +4,7 @@ import { CoursesService } from '../../services/courses/courses.service';
 import { ThemeService } from '../../services/theme.service';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { PurchasesService } from '../../services/purchases/purchases.service';
 
 interface Course {
   idCourses: number;
@@ -18,6 +19,13 @@ interface Theme {
   name: string;
 }
 
+interface User {
+  idUser: number;
+  username: string;
+  email: string;
+  role: string;
+}
+
 @Component({
   selector: 'app-theme',
   standalone: true,
@@ -28,14 +36,17 @@ interface Theme {
 export class ThemeComponent implements OnInit {
   logged:boolean = false;
   themeId: number | undefined;
-  lessons: any[] = []
-  theme: any
+  lessons: any[] = [];
+  theme: any;
+  user: User | null = null;
+  userId: number | undefined;
 
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
     private coursesService : CoursesService,
     private themeService : ThemeService,
+    private purchaseService: PurchasesService,
   ) {}
 
   ngOnInit() {
@@ -62,5 +73,21 @@ export class ThemeComponent implements OnInit {
         console.error('Erreur lors de la récupération du thème:', error)
       )
     )
+
+    this.user = this.authService.getUser();
+    this.userId = this.user?.idUser;
+  }
+
+  canAddToCart(courseId: number): boolean {
+    let canAdd = false;
+    this.purchaseService.canAddToCart(this.userId!, courseId).subscribe({
+      next: (result: boolean) => {
+        canAdd = result;
+      },
+      error: (error) => {
+        console.error('Erreur lors de la vérification:', error);
+      }
+    });
+    return canAdd;
   }
 }

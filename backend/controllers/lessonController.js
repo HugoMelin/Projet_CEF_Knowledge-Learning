@@ -78,6 +78,37 @@ exports.getOneLessonById = async (req, res) => {
 };
 
 /**
+ * Retrieves all lessons for a specific course.
+ * @async
+ * @function getLessonsByCourseId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
+exports.getLessonsByCourseId = async (req, res) => {
+  try {
+    const { idCourse } = req.params;
+    
+    // Validate that idCourse is a number
+    if (isNaN(idCourse)) {
+      return res.status(400).json({ message: 'L\'ID du cours doit être un nombre' });
+    }
+
+    const lessons = await Lesson.findByCourseId(parseInt(idCourse, 10));
+    
+    if (lessons.length === 0) {
+      console.log(`Aucune leçon trouvée pour le cours avec l'ID ${idCourse}`);
+      return res.status(404).json({ message: 'Aucune leçon trouvée pour ce cours' });
+    }
+    
+    res.status(200).json(lessons);
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des leçons pour le cours: ${error}`);
+    res.status(500).json({ message: 'Erreur serveur lors de la récupération des leçons' });
+  }
+};
+
+/**
  * Deletes a lesson by its ID.
  * @async
  * @function deleteLesson

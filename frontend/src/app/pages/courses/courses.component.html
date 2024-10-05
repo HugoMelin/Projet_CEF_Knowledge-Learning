@@ -1,8 +1,7 @@
 <div class="container">
-  <h1 class="text-center">Nos cours sur le thème : {{ theme.name }}</h1>
-
+  <h1 class="text-center">Tous nos cours</h1>
   <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center mt-3">
-    <div *ngFor="let course of lessons" class="col">
+    <div *ngFor="let course of courses" class="col">
       <div class="card h-100 py-3">
         <div class="card-body text-center">
           <h5 class="card-title">{{ course.title }}</h5>
@@ -15,6 +14,5 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
 </div>
