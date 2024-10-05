@@ -1,0 +1,12 @@
+<div class="container">
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div *ngFor="let theme of themes" class="col">
+      <div class="card">
+        <div class="card-body text-center">
+          <h5 class="card-title">{{ theme.name }}</h5>
+          <a routerLink="/themes/{{ theme.id }}" class="card-link">Voir tous les cours</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
