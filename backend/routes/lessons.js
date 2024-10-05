@@ -9,7 +9,9 @@ router.post('/', secure.checkAdminRole, lessonController.createLesson);
 
 router.get('/', secure.checkJWT, lessonController.getAllLessons);
 
-router.get('/:id', secure.checkCourseAccess, secure.checkCourseAccess, lessonController.getOneLessonById);
+router.get('/:id', secure.checkCourseAccess, lessonController.getOneLessonById);
+
+router.get('/course/:idCourse', secure.checkJWT, lessonController.getLessonsByCourseId);
 
 router.delete('/:id', secure.checkAdminRole, lessonController.deleteLesson);
 

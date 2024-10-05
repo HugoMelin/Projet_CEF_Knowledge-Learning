@@ -9,6 +9,7 @@ interface User {
   username: string;
   email: string;
   role: string;
+  isVerified: boolean;
 }
 
 @Injectable({
@@ -74,5 +75,10 @@ export class AuthService {
       console.error('Erreur lors du parsing des données utilisateur:', error);
       return null;
     }
+  }
+
+  isVerified(): boolean {
+    const user = this.getUser();
+    return user ? user.isVerified : false
   }
 }

@@ -101,6 +101,27 @@ class Lesson {
   }
 
   /**
+ * Find all lessons by course ID.
+ * @async
+ * @param {number} courseId - The course ID.
+ * @returns {Promise<Lesson[]>} Array of lessons for the given course.
+ */
+static async findByCourseId(courseId) {
+  try {
+    const [rows] = await db.query(`
+      SELECT title, content, video_url, price, id_courses, id_lessons 
+      FROM lessons 
+      WHERE id_courses = ?
+    `, [courseId]);
+    
+    return rows.map((row) => new Lesson(...Object.values(row)));
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des leçons pour le cours ${courseId}: ${error}`);
+    throw error;
+  }
+}
+
+  /**
    * Delete a lesson.
    * @async
    * @param {Object} data - The lesson data to delete.

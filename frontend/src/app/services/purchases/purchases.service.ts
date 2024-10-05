@@ -3,6 +3,8 @@ import { environment } from '../../../environnements/environnements';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError, shareReplay } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
 
 interface Purchase {
   idPurchase: number;
@@ -19,7 +21,11 @@ export class PurchasesService {
   private apiUrl = `${environment.API_URL}/purchases`;
   private userPurchasesCache: { [userId: number]: Observable<Purchase[]> } = {};
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private authService: AuthService,
+  ) { }
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -29,6 +35,12 @@ export class PurchasesService {
   }
 
   getUserPurchases(userId: number): Observable<Purchase[]> {
+    if (!this.authService.isVerified()) {
+      const errorMessage = 'Votre compte n\'a pas été vérifié.';
+      this.router.navigate(['/'], { queryParams: { error: errorMessage } });
+      return of([])
+    }
+
     if (!this.userPurchasesCache[userId]) {
       const headers = this.getHeaders();
       this.userPurchasesCache[userId] = this.http.get<Purchase[]>(`${this.apiUrl}/user/${userId}`, { headers }).pipe(
