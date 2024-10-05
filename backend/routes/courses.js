@@ -11,6 +11,8 @@ router.get('/', courseController.getAllCourses);
 
 router.get('/:id', courseController.getOneCourseById);
 
+router.get('/theme/:idTheme', courseController.getCoursesByThemeId);
+
 router.delete('/:id', secure.checkAdminRole, courseController.deleteCourse);
 
 router.patch('/:id', secure.checkAdminRole, courseController.updateCourse);
