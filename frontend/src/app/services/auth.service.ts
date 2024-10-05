@@ -13,7 +13,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {
     // Initializing with stored user data to maintain session across page reloads
-    this.currentUserSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('currentUser') || '{}'));
+    this.currentUserSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('currentUser') || 'null'));
     this.currentUser = this.currentUserSubject.asObservable();
   }
 
