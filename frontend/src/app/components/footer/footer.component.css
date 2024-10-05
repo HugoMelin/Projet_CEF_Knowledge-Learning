@@ -1,0 +1,18 @@
+a {
+  padding: 1rem;
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img {
+  width: 50%;
+  max-width: 255px;
+}
+
+li {
+  list-style: none;
+}
