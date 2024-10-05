@@ -21,6 +21,10 @@ export class CoursesService {
     private http: HttpClient
   ) { }
 
+  getAllCourses(): Observable<Course[]> {
+    return this.http.get<Course[]>(this.apiUrl)
+  }
+
   getCoursesByThemeId(themeId:number | undefined): Observable<Course[]> {
     return this.http.get<Course[]>(`${this.apiUrl}/theme/${themeId}`)
   }

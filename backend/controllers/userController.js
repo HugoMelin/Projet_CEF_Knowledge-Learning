@@ -223,7 +223,11 @@ exports.authenticate = async (req, res) => {
 
       res.header('Authorization', `Bearer ${token}`);
 
-      return res.status(200).json(token);
+      return res.status(200).json({
+        message: 'Authentification réussie',
+        token,
+        user,
+      });
     }
     return res.status(403).json('Mauvaise adresse mail');
   } catch (error) {

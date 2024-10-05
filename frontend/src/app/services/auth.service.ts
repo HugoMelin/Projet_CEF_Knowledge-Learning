@@ -4,34 +4,48 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environnements/environnements';
 
+interface User {
+  idUser: number;
+  username: string;
+  email: string;
+  role: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject: BehaviorSubject<any>;
-  public currentUser: Observable<any>;
+  private currentUserSubject: BehaviorSubject<User | null>;
+  public currentUser: Observable<User | null>;
 
   constructor(private http: HttpClient) {
-    // Initializing with stored user data to maintain session across page reloads
-    this.currentUserSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('currentUser') || 'null'));
+    this.currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
     this.currentUser = this.currentUserSubject.asObservable();
   }
 
-  public get currentUserValue() {
+  private getUserFromStorage(): User | null {
+    const storedUser = localStorage.getItem('currentUser');
+    return storedUser ? JSON.parse(storedUser) : null;
+  }
+
+  public get currentUserValue(): User | null {
     return this.currentUserSubject.value;
   }
 
-  login(email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${environment.API_URL}/users/authenticate`, { email, password })
-      .pipe(map(user => {
-        // Persist user session and notify subscribers of the new authentication state
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        this.currentUserSubject.next(user);
-        return user;
+  login(email: string, password: string): Observable<User> {
+    return this.http.post<{ user: User; token: string }>(`${environment.API_URL}/users/authenticate`, { email, password })
+      .pipe(map(response => {
+        if (response.user && response.token) {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('currentUser', JSON.stringify(response.user));
+          this.currentUserSubject.next(response.user);
+        }
+        return response.user;
       }));
   }
 
   logout() {
+    localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
   }
@@ -41,10 +55,24 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.currentUserValue;
+    return !!this.getToken();
   }
 
   getToken(): string | null {
-    return this.currentUserValue ? this.currentUserValue.token : null;
+    return localStorage.getItem('token');
+  }
+
+  getUser(): User | null {
+    const userString = localStorage.getItem('currentUser');
+    if (!userString) {
+      return null;
+    }
+    try {
+      const user: User = JSON.parse(userString);
+      return user;
+    } catch (error) {
+      console.error('Erreur lors du parsing des données utilisateur:', error);
+      return null;
+    }
   }
 }
