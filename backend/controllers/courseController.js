@@ -78,6 +78,37 @@ exports.getOneCourseById = async (req, res) => {
 };
 
 /**
+ * Retrieves all courses for a specific theme.
+ * @async
+ * @function getCoursesByThemeId
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>}
+ */
+exports.getCoursesByThemeId = async (req, res) => {
+  try {
+    const { idTheme } = req.params;
+    
+    // Validate that idTheme is a number
+    if (isNaN(idTheme)) {
+      return res.status(400).json({ message: 'L\'ID du thème doit être un nombre' });
+    }
+
+    const courses = await Course.findByThemeId(parseInt(idTheme, 10));
+    
+    if (courses.length === 0) {
+      console.log(`Aucun cours trouvé pour le thème avec l'ID ${idTheme}`);
+      return res.status(404).json({ message: 'Aucun cours trouvé pour ce thème' });
+    }
+    
+    res.status(200).json(courses);
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des cours pour le thème: ${error}`);
+    res.status(500).json({ message: 'Erreur serveur lors de la récupération des cours' });
+  }
+};
+
+/**
  * Deletes a course by its ID.
  * @async
  * @function deleteCourse

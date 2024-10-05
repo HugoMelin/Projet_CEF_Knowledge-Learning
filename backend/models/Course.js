@@ -95,6 +95,27 @@ class Course {
     }
   }
 
+/**
+ * Find all courses by theme ID.
+ * @async
+ * @param {number} themeId - The theme ID.
+ * @returns {Promise<Course[]>} Array of courses for the given theme.
+ */
+static async findByThemeId(themeId) {
+  try {
+    const [rows] = await db.query(`
+      SELECT title, description, price, id_themes, id_courses 
+      FROM courses 
+      WHERE id_themes = ?
+    `, [themeId]);
+    
+    return rows.map((row) => new Course(...Object.values(row)));
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des cours pour le thème ${themeId}: ${error}`);
+    throw error;
+  }
+}
+
   /**
    * Delete a course.
    * @async

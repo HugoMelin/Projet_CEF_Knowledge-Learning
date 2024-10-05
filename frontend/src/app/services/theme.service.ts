@@ -19,4 +19,8 @@ export class ThemeService {
   getThemes(): Observable<Theme[]> {
     return this.http.get<Theme[]>(this.apiUrl);
   }
+
+  getThemeById(themeId:number | undefined): Observable<Theme> {
+    return this.http.get<Theme>(`${this.apiUrl}/${themeId}`);
+  }
 }
