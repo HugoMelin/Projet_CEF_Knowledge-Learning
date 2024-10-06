@@ -1,0 +1,30 @@
+<div class="card">
+  <div class="card-body">
+    <h4 class="card-title">Certifications validées</h4>
+  
+    <div class="card-body">
+      <div *ngIf="validatedCertifications.length === 0" class="alert alert-info">
+        Vous n'avez pas encore validé de certifications.
+      </div>
+      
+      <div *ngIf="validatedCertifications.length > 0">
+        <table class="table table-striped">
+          <thead>
+            <tr class="text-center">
+              <th>ID Certification</th>
+              <th>Thème</th>
+              <th>Date d'obtention</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let cert of validatedCertifications" class="text-center">
+              <td>{{ cert.idCertifications }}</td>
+              <td>{{ cert.themeTitle }}</td>
+              <td>{{ cert.obtainedDate | date:'dd/MM/yyyy' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
