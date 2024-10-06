@@ -34,8 +34,23 @@ export class LessonsService {
     return this.http.get<Lesson[]>(this.apiUrl, { headers });
   }
 
+  getLessonById(idLesson:number | undefined): Observable<Lesson> {
+    const headers = this.getHeaders();
+    return this.http.get<Lesson>(`${this.apiUrl}/${idLesson}`, { headers });
+  }
+
   getLessonsByCourseId(courseId:number | undefined): Observable<Lesson[]>{
     const headers = this.getHeaders();
     return this.http.get<Lesson[]>(`${this.apiUrl}/course/${courseId}`, { headers })
+  }
+
+  validateLesson(idUser:number | undefined, idLesson:number | undefined): Observable<Lesson[]>{
+    const headers = this.getHeaders();
+    return this.http.post<Lesson[]>(`${environment.API_URL}/completed_lessons/`, {idUser: idUser, idLessons: idLesson},{ headers })
+  }
+
+  checkLessonCompletion(userId: number | undefined, lessonId: number | undefined): Observable<any> {
+    const headers = this.getHeaders();
+    return this.http.get(`${environment.API_URL}/completed_lessons/${userId}/${lessonId}`, { headers });
   }
 }
