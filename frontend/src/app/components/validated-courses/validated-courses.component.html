@@ -1,0 +1,30 @@
+<div class="card">
+  <div class="card-body">
+    <h4 class="card-title">Cours validés</h4>
+  
+    <div class="card-body">
+      <div *ngIf="validatedCourses.length === 0" class="alert alert-info">
+        Vous n'avez pas encore validé de cours.
+      </div>
+      
+      <div *ngIf="validatedCourses.length > 0">
+        <table class="table table-striped">
+          <thead>
+            <tr class="text-center">
+              <th>Nom du cours</th>
+              <th>Date de validation</th>
+              <th>Nom du thème</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let course of validatedCourses" class="text-center">
+              <td>{{ course.courseTitle }}</td>
+              <td>{{ course.completedDate | date:'dd/MM/yyyy' }}</td>
+              <td>{{ course.themeTitle }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
