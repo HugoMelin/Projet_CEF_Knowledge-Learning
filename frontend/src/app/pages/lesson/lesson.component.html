@@ -1,0 +1,23 @@
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card shadow">
+        <div class="card-body">
+          <h1 class="card-title mb-4">{{ lesson?.title }}</h1>
+          
+          <div class="embed-responsive embed-responsive-16by9 w-75 mb-4 mx-auto object-fit-contain">
+            <iframe class="w-100 embed-responsive-item" [src]="lesson?.videoUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          </div>
+
+          <div class="lesson-content">
+            <p class="lead">{{ lesson?.content }}</p>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button [disabled]="isLessonCompleted"  class="btn btn-primary" (click)="validateLesson(lesson?.idLessons)">J'ai terminer la leçon.</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
