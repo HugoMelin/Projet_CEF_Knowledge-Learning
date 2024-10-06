@@ -11,10 +11,11 @@ class Invoice {
    * @param {number} price - The invoice price.
    * @param {number} [idInvoice=null] - The invoice ID.
    */
-  constructor(idUser, price, idInvoice = null) {
+  constructor(idUser, price, idInvoice = null, created_at = null) {
     this.idInvoice = idInvoice;
     this.idUser = idUser;
     this.price = price;
+    this.created_at = created_at;
   }
 
   /**
@@ -81,7 +82,7 @@ class Invoice {
    */
   static async findByUserId(userId) {
     try {
-      const [rows] = await db.query('SELECT id_user, price, id_invoice FROM invoices WHERE id_user = ?', [userId]);
+      const [rows] = await db.query('SELECT id_user, price, id_invoice, created_at FROM invoices WHERE id_user = ?', [userId]);
       return rows.map((row) => new Invoice(...Object.values(row)));
     } catch (error) {
       console.error(`Erreur lors de la recherche des factures de l'utilisateur : ${error}`);

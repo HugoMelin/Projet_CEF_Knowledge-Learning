@@ -6,6 +6,7 @@ import { ValidatedLessonsComponent } from '../../components/validated-lessons/va
 import { ValidatedCoursesComponent } from '../../components/validated-courses/validated-courses.component';
 import { CertificationsComponent } from '../../components/certifications/certifications.component';
 import { PurchasesComponent } from '../../components/purchases/purchases.component';
+import { InvoicesComponent } from '../../components/invoices/invoices.component';
 
 interface User {
   idUser: number;
@@ -18,7 +19,7 @@ interface User {
 @Component({
   selector: 'app-compte',
   standalone: true,
-  imports: [ CommonModule, ValidatedLessonsComponent, ValidatedCoursesComponent, CertificationsComponent, PurchasesComponent ],
+  imports: [ CommonModule, ValidatedLessonsComponent, ValidatedCoursesComponent, CertificationsComponent, PurchasesComponent, InvoicesComponent ],
   templateUrl: './compte.component.html',
   styleUrl: './compte.component.css'
 })
