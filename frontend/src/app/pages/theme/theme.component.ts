@@ -5,6 +5,7 @@ import { ThemeService } from '../../services/theme.service';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { PurchasesService } from '../../services/purchases/purchases.service';
+import { CartService } from '../../services/cart/cart.service';
 
 interface Course {
   idCourses: number;
@@ -47,6 +48,7 @@ export class ThemeComponent implements OnInit {
     private coursesService : CoursesService,
     private themeService : ThemeService,
     private purchaseService: PurchasesService,
+    private cartService: CartService,
   ) {}
 
   ngOnInit() {
@@ -89,5 +91,19 @@ export class ThemeComponent implements OnInit {
       }
     });
     return canAdd;
+  }
+
+  addToCart(event: Event, course: Course) {
+    event.preventDefault();
+    const product = {
+      id: course.idCourses,
+      name: course.title,
+      price: course.price,
+      quantity: 1,
+      type: 'course'
+    }
+
+    this.cartService.addToCart(product);
+    console.log('Produit ajouté au panier', product);
   }
 }
