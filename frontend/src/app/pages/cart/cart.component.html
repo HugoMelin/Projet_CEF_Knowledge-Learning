@@ -1,8 +1,47 @@
-<div class="container">
-  <h2>Votre panier</h2>
-    <ul>
-      <li *ngFor="let item of items">
-        {{ item.name }} - {{ item.price | currency }}
-      </li>
-    </ul>
+<div class="container mt-4">
+  <h2 class="mb-4">Votre panier</h2>
+  
+  <div *ngIf="items.length === 0" class="alert alert-info">
+    Votre panier est vide.
+  </div>
+
+  <div *ngIf="items.length > 0">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Contenu</th>
+          <th>Produit</th>
+          <th>Prix</th>
+          <th>Total</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items">
+          <td>{{ item.type | uppercase }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.price }} €</td>
+          <td>{{ item.price * item.quantity | euroCurrency }}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" (click)="removeItem(item)">
+              <i class="bi bi-trash"></i> Supprimer
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <button class="btn btn-warning" (click)="clearCart()">
+        <i class="bi bi-cart-x"></i> Vider le panier
+      </button>
+      <h4>Total : <strong>{{ total | euroCurrency }}</strong></h4>
+    </div>
+
+    <div class="text-end mt-4">
+      <button class="btn btn-primary btn-lg" (click)="payer()">
+        <i class="bi bi-credit-card"></i> Payer
+      </button>
+    </div>
+  </div>
 </div>

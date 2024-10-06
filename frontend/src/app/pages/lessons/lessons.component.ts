@@ -4,14 +4,15 @@ import { Router, RouterLink } from '@angular/router';
 import { LessonsService } from '../../services/lessons/lessons.service';
 import { AuthService } from '../../services/auth.service';
 import { PurchasesService } from '../../services/purchases/purchases.service';
+import { CartService } from '../../services/cart/cart.service';
 
 interface Lesson {
-  idLesson:number;
+  idLessons:number;
   title:string;
   content:string;
   videoUrl:string;
   price:number;
-  idCourse:number;
+  idCourses:number;
 }
 
 interface User {
@@ -53,6 +54,7 @@ export class LessonsComponent implements OnInit {
     private lessonsService: LessonsService,
     private router: Router,
     private purchaseService: PurchasesService,
+    private cartService: CartService,
   ) {}
 
   ngOnInit() {
@@ -97,5 +99,19 @@ export class LessonsComponent implements OnInit {
     this.currentPage = page;
     const startIndex = (page - 1) * this.pageSize;
     this.pagedLessons = this.lessons.slice(startIndex, startIndex + this.pageSize);
+  }
+  
+  addToCart(event: Event, lesson: Lesson) {
+    event.preventDefault();
+    const product = {
+      id: lesson.idLessons,
+      name: lesson.title,
+      price: lesson.price,
+      quantity: 1,
+      type: 'lesson'
+    }
+
+    this.cartService.addToCart(product);
+    console.log('Produit ajouté au panier', product);
   }
 }

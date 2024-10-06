@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CoursesService } from '../../services/courses/courses.service';
 import { PurchasesService } from '../../services/purchases/purchases.service';
+import { CartService } from '../../services/cart/cart.service';
 
 interface Course {
   idCourses: number;
@@ -49,7 +50,8 @@ export class CoursesComponent implements OnInit {
     private authService: AuthService,
     private courseService: CoursesService,
     private router: Router,
-    private purchaseService: PurchasesService
+    private purchaseService: PurchasesService,
+    private cartService: CartService,
   ) {}
 
   ngOnInit(): void {
@@ -95,5 +97,19 @@ export class CoursesComponent implements OnInit {
     this.currentPage = page;
     const startIndex = (page - 1) * this.pageSize;
     this.pagedCourses = this.courses.slice(startIndex, startIndex + this.pageSize);
+  }
+
+  addToCart(event: Event, course: Course) {
+    event.preventDefault();
+    const product = {
+      id: course.idCourses,
+      name: course.title,
+      price: course.price,
+      quantity: 1,
+      type: 'course'
+    }
+
+    this.cartService.addToCart(product);
+    console.log('Produit ajouté au panier', product);
   }
 }

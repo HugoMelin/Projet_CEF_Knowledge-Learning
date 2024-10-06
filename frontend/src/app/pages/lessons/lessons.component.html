@@ -8,7 +8,12 @@
           <div *ngIf="logged" class="mt-3">
             <div class="row px-5 gap-2 justify-content-center">
               <a *ngIf="!canAddToCart(lesson.idLessons, lesson.idCourses) && user?.isVerified" routerLink="/lecon/{{ lesson.idLessons }}" class="card-link col-6 btn btn-outline-secondary">Voir le contenu</a>
-              <a *ngIf="canAddToCart(lesson.idLessons, lesson.idCourses)" routerLink="#" class="col btn btn-primary">Ajouter au panier</a>
+              <div div *ngIf="canAddToCart(lesson.idLessons, lesson.idCourses)" class="d-flex flex-column gap-2">
+                <div div *ngIf="canAddToCart(lesson.idLessons, lesson.idCourses)" class="col d-flex flex-column gap-2">
+                  <a class="col btn btn-primary" (click)="addToCart($event, lesson)">Ajouter au panier</a>
+                  <p>{{ lesson.price }} €</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

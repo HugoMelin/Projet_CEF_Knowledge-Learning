@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { PurchasesService } from '../../services/purchases/purchases.service';
 import { LessonsService } from '../../services/lessons/lessons.service';
 import { CoursesService } from '../../services/courses/courses.service';
+import { CartService } from '../../services/cart/cart.service';
 
 interface User {
   idUser: number;
@@ -23,7 +24,7 @@ interface Course {
 }
 
 interface Purchase {
-  idPurchase: number;
+  idPurchases: number;
   idUser: number;
   idCourses: number | null ;
   idLessons: number | null;
@@ -31,12 +32,12 @@ interface Purchase {
 }
 
 interface Lesson {
-  idLesson:number;
+  idLessons:number;
   title:string;
   content:string;
   videoUrl:string;
   price:number;
-  idCourse:number;
+  idCourses:number;
 }
 
 @Component({
@@ -61,6 +62,7 @@ export class CourseComponent implements OnInit {
     private purchaseService: PurchasesService,
     private coursesService: CoursesService,
     private route: ActivatedRoute,
+    private cartService: CartService
   ) {}
 
   ngOnInit() {
@@ -107,5 +109,19 @@ export class CourseComponent implements OnInit {
       }
     });
     return canAdd;
+  }
+
+  addToCart(event: Event, lesson: Lesson) {
+    event.preventDefault();
+    const product = {
+      id: lesson.idLessons,
+      name: lesson.title,
+      price: lesson.price,
+      quantity: 1,
+      type: 'lesson'
+    }
+
+    this.cartService.addToCart(product);
+    console.log('Produit ajouté au panier', product);
   }
 }
