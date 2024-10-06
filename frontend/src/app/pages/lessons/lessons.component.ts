@@ -1,10 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { LessonsService } from '../../services/lessons/lessons.service';
 import { AuthService } from '../../services/auth.service';
 import { PurchasesService } from '../../services/purchases/purchases.service';
-import { LessonsService } from '../../services/lessons/lessons.service';
-import { CoursesService } from '../../services/courses/courses.service';
+
+interface Lesson {
+  idLesson:number;
+  title:string;
+  content:string;
+  videoUrl:string;
+  price:number;
+  idCourse:number;
+}
 
 interface User {
   idUser: number;
@@ -22,45 +30,29 @@ interface Course {
   idTheme: number;
 }
 
-interface Purchase {
-  idPurchase: number;
-  idUser: number;
-  idCourses: number | null ;
-  idLessons: number | null;
-  idInvoice: number;
-}
-
-interface Lesson {
-  idLesson:number;
-  title:string;
-  content:string;
-  videoUrl:string;
-  price:number;
-  idCourse:number;
-}
-
 @Component({
-  selector: 'app-course',
+  selector: 'app-lessons',
   standalone: true,
   imports: [ CommonModule, RouterLink ],
-  templateUrl: './course.component.html',
-  styleUrl: './course.component.css'
+  templateUrl: './lessons.component.html',
+  styleUrl: './lessons.component.css'
 })
-export class CourseComponent implements OnInit {
+export class LessonsComponent implements OnInit {
   logged:boolean = false;
-  courseId: number | undefined;
-  lessons: any[] = [];
-  course: any;
+  lessons:any[] = [];
   user: User | null = null;
   userId: number | undefined;
+
+  pagedLessons: any[] = [];
+  currentPage: number = 1;
+  pageSize: number = 9;
+  totalPages: number = 0;
 
   constructor(
     private authService: AuthService,
     private lessonsService: LessonsService,
     private router: Router,
     private purchaseService: PurchasesService,
-    private coursesService: CoursesService,
-    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
@@ -70,25 +62,14 @@ export class CourseComponent implements OnInit {
       this.router.navigate(['/connexion']);
     }
 
-    this.route.params.subscribe(params => {
-      this.courseId = +params['idCours'];
-    });
-
-    this.lessonsService.getLessonsByCourseId(this.courseId).subscribe(
-      data => (
-        this.lessons = data
-      ),
-      (error:any) => (
-        console.error('Erreur lors de la récupération des leçons', error)
-      )
-    )
-
-    this.coursesService.getCourseById(this.courseId).subscribe(
-      data => (
-        this.course = data
-      ),
+    this.lessonsService.getAllLessons().subscribe(
+      data => {
+        this.lessons = data;
+        this.totalPages = Math.ceil(this.lessons.length / this.pageSize);
+        this.setPage(1);
+      },
       (error) => (
-        console.error('Erreur lors de la récupération du cours:', error)
+        console.error('Erreur lors de la récupération des leçons:', error)
       )
     )
 
@@ -107,5 +88,14 @@ export class CourseComponent implements OnInit {
       }
     });
     return canAdd;
+  }
+
+  setPage(page: number) {
+    if (page < 1 || page > this.totalPages) {
+      return;
+    }
+    this.currentPage = page;
+    const startIndex = (page - 1) * this.pageSize;
+    this.pagedLessons = this.lessons.slice(startIndex, startIndex + this.pageSize);
   }
 }

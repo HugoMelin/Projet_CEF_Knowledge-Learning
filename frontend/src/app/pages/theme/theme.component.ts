@@ -80,7 +80,7 @@ export class ThemeComponent implements OnInit {
 
   canAddToCart(courseId: number): boolean {
     let canAdd = false;
-    this.purchaseService.canAddToCart(this.userId!, courseId).subscribe({
+    this.purchaseService.canAddToCart(this.userId!, courseId, null).subscribe({
       next: (result: boolean) => {
         canAdd = result;
       },
