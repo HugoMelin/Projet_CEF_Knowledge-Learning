@@ -10,6 +10,7 @@ import { CartComponent } from './pages/cart/cart.component';
 import { PayementSuccesComponent } from './pages/payement-succes/payement-succes.component';
 import { PayementCancelComponent } from './pages/payement-cancel/payement-cancel.component';
 import { LessonComponent } from './pages/lesson/lesson.component';
+import { CompteComponent } from './pages/compte/compte.component';
 
 export const routes: Routes = [
   {path: "", component: IndexComponent, title: "Knowledge Learning"},
@@ -23,4 +24,5 @@ export const routes: Routes = [
   {path: "panier", component: CartComponent, title: "Panier | Knowledge Learning"},
   {path: "payement-succes", component: PayementSuccesComponent, title: "Payement réussi | Knowledge Learning"},
   {path: "payement-cancel", component: PayementCancelComponent, title: "Payement refusé | Knowledge Learning"},
+  {path: "compte", component: CompteComponent, title: "Mon compte | Knowledge Learning"},
 ];

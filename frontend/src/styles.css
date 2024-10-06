@@ -16,7 +16,6 @@
   --bs-btn-hover-color: #fff;
   --bs-btn-hover-bg: #0074c7;
   --bs-btn-hover-border-color: #0074c7;
-  border-radius: 10rem;
 }
 
 .bg-secondary {
@@ -25,6 +24,10 @@
 
 .bg-primary {
   background-color: #f1f8fc !important;
+}
+
+.text-primary {
+  color: #0074c7 !important
 }
 
 main {
