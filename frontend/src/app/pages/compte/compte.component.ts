@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ValidatedLessonsComponent } from '../../components/validated-lessons/validated-lessons.component';
 import { ValidatedCoursesComponent } from '../../components/validated-courses/validated-courses.component';
 import { CertificationsComponent } from '../../components/certifications/certifications.component';
+import { PurchasesComponent } from '../../components/purchases/purchases.component';
 
 interface User {
   idUser: number;
@@ -17,7 +18,7 @@ interface User {
 @Component({
   selector: 'app-compte',
   standalone: true,
-  imports: [ CommonModule, ValidatedLessonsComponent, ValidatedCoursesComponent, CertificationsComponent ],
+  imports: [ CommonModule, ValidatedLessonsComponent, ValidatedCoursesComponent, CertificationsComponent, PurchasesComponent ],
   templateUrl: './compte.component.html',
   styleUrl: './compte.component.css'
 })

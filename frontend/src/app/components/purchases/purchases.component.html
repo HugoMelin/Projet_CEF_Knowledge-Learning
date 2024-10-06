@@ -1,0 +1,30 @@
+<div class="card">
+  <div class="card-body">
+    <h4 class="card-title">Mes achats</h4>
+  
+    <div class="card-body">
+      <div *ngIf="purchases.length === 0" class="alert alert-info">
+        Vous n'avez pas encore effectué d'achats.
+      </div>
+      
+      <div *ngIf="purchases.length > 0">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Type</th>
+              <th>Date d'achat</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let purchase of purchases">
+              <td>{{ purchase.title }}</td>
+              <td>{{ purchase.type === 'course' ? 'Cours' : 'Leçon' }}</td>
+              <td>{{ purchase.purchaseDate | date:'dd/MM/yyyy' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

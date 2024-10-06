@@ -29,6 +29,11 @@
               Mes achats
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="showComponent('invoices')">
+              Mes factures
+            </a>
+          </li>
         </ul>
       </div>
     </nav>
@@ -55,7 +60,8 @@
       <app-validated-lessons *ngIf="currentComponent === 'lessons'"></app-validated-lessons>
       <app-validated-courses *ngIf="currentComponent === 'courses'"></app-validated-courses>
       <app-certifications *ngIf="currentComponent === 'certifications'"></app-certifications>
-      <!--<app-purchases *ngIf="currentComponent === 'purchases'"></app-purchases>-->
+      <app-purchases *ngIf="currentComponent === 'purchases'"></app-purchases>
+      <app-invoices *ngIf="currentComponent === 'invoices'"></app-invoices>
     </main>
   </div>
 </div>
