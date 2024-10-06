@@ -11,6 +11,6 @@ const secure = require('../middleware/secure');
 
 router.post('/', secure.checkIfVerify, paymentController.createCheckoutSession.bind(paymentController));
 
-router.get('/success', secure.checkIfVerify, paymentController.handleSuccess.bind(paymentController));
+router.get('/success', paymentController.handleSuccess.bind(paymentController));
 
 module.exports = router;

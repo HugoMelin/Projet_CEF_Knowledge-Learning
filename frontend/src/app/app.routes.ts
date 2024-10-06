@@ -7,6 +7,8 @@ import { CoursesComponent } from './pages/courses/courses.component';
 import { CourseComponent } from './pages/course/course.component';
 import { LessonsComponent } from './pages/lessons/lessons.component';
 import { CartComponent } from './pages/cart/cart.component';
+import { PayementSuccesComponent } from './pages/payement-succes/payement-succes.component';
+import { PayementCancelComponent } from './pages/payement-cancel/payement-cancel.component';
 
 export const routes: Routes = [
   {path: "", component: IndexComponent, title: "Knowledge Learning"},
@@ -17,4 +19,6 @@ export const routes: Routes = [
   {path: "cours/:idCours", component: CourseComponent, title: "Leçon | Knowledge Learning"},  
   {path: "lecons", component: LessonsComponent, title: "Leçons | Knowledge Learning"},
   {path: "panier", component: CartComponent, title: "Panier | Knowledge Learning"},
+  {path: "payement-succes", component: PayementSuccesComponent, title: "Payement réussi | Knowledge Learning"},
+  {path: "payement-cancel", component: PayementCancelComponent, title: "Payement refusé | Knowledge Learning"},
 ];

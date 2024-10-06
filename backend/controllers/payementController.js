@@ -47,11 +47,11 @@ class PaymentController {
       const session = await this.stripeService.createCheckoutSession(
         items,
         `${req.protocol}://${req.get('host')}/api/create-checkout-session/success?session_id={CHECKOUT_SESSION_ID}`,
-        `${req.protocol}://${req.get('host')}/cancel`,
+        `http://localhost:4200/payement-cancel`,
         `${idUser}`,
       );
 
-      res.json({ sessionId: session });
+      res.json({ url: session.url });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -99,7 +99,8 @@ class PaymentController {
         return Purchase.create(purchaseData);
       }));
 
-      res.redirect('/success-page'); // Redirect to success page
+      //window.location.href = 'http://localhost:4200/payement-succes';
+      res.redirect('http://localhost:4200/payement-succes'); // Redirect to success page
     } catch (error) {
       console.error('Erreur détaillée:', error);
       if (error instanceof jwt.JsonWebTokenError) {

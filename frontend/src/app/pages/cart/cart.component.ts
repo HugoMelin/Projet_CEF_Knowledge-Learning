@@ -3,6 +3,7 @@ import { CartService } from '../../services/cart/cart.service';
 import { CommonModule } from '@angular/common';
 import { EuroCurrencyPipe } from '../../pipes/euro-currency.pipe';
 import { Subscription } from 'rxjs';
+import { PaymentService } from '../../services/payement/payment.service';
 
 interface CartItem {
   id: number;
@@ -25,8 +26,12 @@ export class CartComponent implements OnInit, OnDestroy {
   total: number = 0;
   private cartSubscription: Subscription | undefined;
   private totalSubscription: Subscription | undefined;
+  cart: any;
 
-  constructor(private cartService: CartService) { }
+  constructor(
+    private cartService: CartService,
+    private paymentService: PaymentService
+  ) { }
 
   ngOnInit() {
     this.cartSubscription = this.cartService.getItems().subscribe(
@@ -65,6 +70,14 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   payer() {
-    console.log('Click')
+    this.paymentService.createCheckoutSession().subscribe({
+      next: (url) => {
+        console.log('URL de redirection:', url);
+        window.location.href = url;
+      },
+      error: (error) => {
+        console.error('Erreur lors de la création de la session:', error);
+      }
+    });
   }
 }
