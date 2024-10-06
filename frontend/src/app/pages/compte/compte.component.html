@@ -1,0 +1,67 @@
+<div class="container-fluid">
+  <div class="row">
+    <!-- Side menu -->
+    <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+      <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" (click)="showComponent('profile')">
+              Profil
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="showComponent('lessons')">
+              Leçons validées
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="showComponent('courses')">
+              Cours validés
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="showComponent('certifications')">
+              Certifications
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="showComponent('purchases')">
+              Mes achats
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="showComponent('invoices')">
+              Mes factures
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Mon Compte</h1>
+      </div>
+
+      <div *ngIf="currentComponent === 'profile'">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Informations utilisateur</h4>
+            <h5 class="card-title">
+              {{ user?.username }}
+              <span *ngIf="checkAdmin()" class="badge bg-success ms-2">Admin</span>
+              <span *ngIf="!user?.isVerified" class="badge bg-danger ms-2">Non vérifié</span>
+            </h5>
+            <p class="card-text">Email: {{ user?.email }}</p>
+          </div>
+        </div>
+      </div>
+
+      <app-validated-lessons *ngIf="currentComponent === 'lessons'"></app-validated-lessons>
+      <app-validated-courses *ngIf="currentComponent === 'courses'"></app-validated-courses>
+      <app-certifications *ngIf="currentComponent === 'certifications'"></app-certifications>
+      <app-purchases *ngIf="currentComponent === 'purchases'"></app-purchases>
+      <app-invoices *ngIf="currentComponent === 'invoices'"></app-invoices>
+    </main>
+  </div>
+</div>

@@ -1,7 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environnements/environnements';
-import { Observable } from 'rxjs';
+import { forkJoin, map, mergeMap, Observable } from 'rxjs';
+import { CoursesService } from '../courses/courses.service';
 
 interface Lesson {
   idLessons:number;
@@ -12,6 +13,14 @@ interface Lesson {
   idCourses:number;
 }
 
+interface CompletedLesson {
+  idUser:number;
+  idLessons:number;
+  completedDate:string;
+  lessonTitle?: string;
+  courseTitle?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -19,7 +28,8 @@ export class LessonsService {
   private apiUrl = `${environment.API_URL}/lessons`;
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private courseService: CoursesService
   ) { }
 
   private getHeaders(): HttpHeaders {
@@ -53,4 +63,38 @@ export class LessonsService {
     const headers = this.getHeaders();
     return this.http.get(`${environment.API_URL}/completed_lessons/${userId}/${lessonId}`, { headers });
   }
+
+  getValidatedLessons(userId?: number): Observable<CompletedLesson[]> {
+    const headers = this.getHeaders();
+    return this.http.get<CompletedLesson[]>(`${environment.API_URL}/completed_lessons/${userId}`, { headers }).pipe(
+      mergeMap(completedLessons => {
+        const lessonRequests = completedLessons.map(lesson => 
+          this.getLessonDetailsWithCourse(lesson.idLessons)
+        );
+        return forkJoin(lessonRequests).pipe(
+          map(lessonDetails => {
+            return completedLessons.map((lesson, index) => ({
+              ...lesson,
+              lessonTitle: lessonDetails[index].lessonTitle,
+              courseTitle: lessonDetails[index].courseTitle
+            }));
+          })
+        );
+      })
+    );
+  }
+
+  private getLessonDetailsWithCourse(lessonId: number): Observable<{ lessonTitle: string, courseTitle: string }> {
+    return this.getLessonById(lessonId).pipe(
+      mergeMap(lessonDetails => 
+        this.courseService.getCourseById(lessonDetails.idCourses).pipe(
+          map(courseDetails => ({
+            lessonTitle: lessonDetails.title,
+            courseTitle: courseDetails.title,
+          }))
+        )
+      )
+    );
+  }
 }
+
