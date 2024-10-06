@@ -6,6 +6,7 @@ import { ThemeComponent } from './pages/theme/theme.component';
 import { CoursesComponent } from './pages/courses/courses.component';
 import { CourseComponent } from './pages/course/course.component';
 import { LessonsComponent } from './pages/lessons/lessons.component';
+import { CartComponent } from './pages/cart/cart.component';
 
 export const routes: Routes = [
   {path: "", component: IndexComponent, title: "Knowledge Learning"},
@@ -14,5 +15,6 @@ export const routes: Routes = [
   {path: "theme/:idTheme", component: ThemeComponent, title: "Thème | Knowledge Learning"},
   {path: "tous-les-cours", component: CoursesComponent, title: "Cours | Knowledge Learning"},
   {path: "cours/:idCours", component: CourseComponent, title: "Leçon | Knowledge Learning"},  
-  {path: "lecons", component: LessonsComponent, title: "Leçons | Knowledge Learning"},  
+  {path: "lecons", component: LessonsComponent, title: "Leçons | Knowledge Learning"},
+  {path: "panier", component: CartComponent, title: "Panier | Knowledge Learning"},
 ];
