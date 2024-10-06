@@ -54,9 +54,27 @@ export class PurchasesService {
     return this.userPurchasesCache[userId];
   }
 
-  canAddToCart(userId: number, courseId: number): Observable<boolean> {
+  canAddToCart(userId: number, courseId: number | null, lessonId: number | null): Observable<boolean> {
+    if (!this.authService.isVerified()) {
+      return of(false);
+    }
     return this.getUserPurchases(userId).pipe(
-      map(purchases => !purchases.some(p => p.idCourses === courseId))
+      map(purchases => {
+
+        if (courseId && lessonId) {
+          const hasPurchasedCourse = purchases.some(p => p.idCourses === courseId);
+          
+          const hasPurchasedLesson = purchases.some(p => p.idLessons === lessonId);
+          
+          return !(hasPurchasedCourse || hasPurchasedLesson);
+        } else {
+          const hasPurchasedCourse = !purchases.some(p => p.idCourses === courseId);
+          
+          const hasPurchasedLesson = !purchases.some(p => p.idLessons === lessonId);
+          
+          return (hasPurchasedCourse || hasPurchasedLesson);
+        }
+      })
     );
   }
 

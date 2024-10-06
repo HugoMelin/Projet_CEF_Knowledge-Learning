@@ -1,7 +1,7 @@
 <div class="container">
   <h1 class="text-center">Tous nos thèmes</h1>
   <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center mt-3">
-    <div *ngFor="let theme of themes" class="col">
+    <div *ngFor="let theme of pagedThemes" class="col">
       <div class="card h-100 py-3">
         <div class="card-body text-center">
           <h5 class="card-title">{{ theme.name }}</h5>
@@ -10,4 +10,23 @@
       </div>
     </div>
   </div>
+
+  <nav *ngIf="totalPages <= 0" aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="setPage(currentPage - 1)" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index"
+          [class.active]="currentPage === i + 1">
+        <a class="page-link" (click)="setPage(i + 1)">{{i + 1}}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="setPage(currentPage + 1)" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 </div>

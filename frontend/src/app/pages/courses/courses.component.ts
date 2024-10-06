@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ModuleWithComponentFactories, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CoursesService } from '../../services/courses/courses.service';
@@ -40,6 +40,10 @@ export class CoursesComponent implements OnInit {
   courses:any[] = [];
   user: User | null = null;
   userId: number | undefined;
+  pagedCourses: any[] = [];
+  currentPage: number = 1;
+  pageSize: number = 9;
+  totalPages: number = 0;
 
   constructor(
     private authService: AuthService,
@@ -58,7 +62,9 @@ export class CoursesComponent implements OnInit {
 
     this.courseService.getAllCourses().subscribe(
       data => {
-        this.courses = data
+        this.courses = data;
+        this.totalPages = Math.ceil(this.courses.length / this.pageSize);
+        this.setPage(1);
       },
       (error) => (
         console.error('Erreur lors de la récupération des cours:', error)
@@ -71,7 +77,7 @@ export class CoursesComponent implements OnInit {
 
   canAddToCart(courseId: number): boolean {
     let canAdd = false;
-    this.purchaseService.canAddToCart(this.userId!, courseId).subscribe({
+    this.purchaseService.canAddToCart(this.userId!, courseId, null).subscribe({
       next: (result: boolean) => {
         canAdd = result;
       },
@@ -80,5 +86,14 @@ export class CoursesComponent implements OnInit {
       }
     });
     return canAdd;
+  }
+
+  setPage(page: number) {
+    if (page < 1 || page > this.totalPages) {
+      return;
+    }
+    this.currentPage = page;
+    const startIndex = (page - 1) * this.pageSize;
+    this.pagedCourses = this.courses.slice(startIndex, startIndex + this.pageSize);
   }
 }

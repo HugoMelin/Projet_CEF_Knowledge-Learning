@@ -4,12 +4,12 @@ import { environment } from '../../../environnements/environnements';
 import { Observable } from 'rxjs';
 
 interface Lesson {
-  idLesson:number;
+  idLessons:number;
   title:string;
   content:string;
   videoUrl:string;
   price:number;
-  idCourse:number;
+  idCourses:number;
 }
 
 @Injectable({
@@ -27,6 +27,11 @@ export class LessonsService {
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
+  }
+
+  getAllLessons(): Observable<Lesson[]> {
+    const headers = this.getHeaders();
+    return this.http.get<Lesson[]>(this.apiUrl, { headers });
   }
 
   getLessonsByCourseId(courseId:number | undefined): Observable<Lesson[]>{

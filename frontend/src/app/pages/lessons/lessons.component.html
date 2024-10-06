@@ -1,15 +1,14 @@
 <div class="container">
-  <h1 class="text-center">Tous nos cours</h1>
+  <h1 class="text-center">Toutes nos leçons</h1>
   <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center mt-3">
-    <div *ngFor="let course of pagedCourses" class="col">
+    <div *ngFor="let lesson of pagedLessons" class="col">
       <div class="card h-100 py-3">
         <div class="card-body text-center">
-          <h5 class="card-title">{{ course.title }}</h5>
-          <h6 class="card-subtitle">{{ course.description }}</h6>
+          <h5 class="card-title">{{ lesson.title }}</h5>
           <div *ngIf="logged" class="mt-3">
             <div class="row px-5 gap-2 justify-content-center">
-              <a routerLink="/cours/{{ course.idCourses }}" class="card-link col-6 btn btn-outline-secondary">Voir toutes les leçons</a>
-              <a *ngIf="canAddToCart(course.idCourses)" routerLink="#" class="col btn btn-primary">Ajouter au panier</a>
+              <a *ngIf="!canAddToCart(lesson.idLessons, lesson.idCourses) && user?.isVerified" routerLink="/lecon/{{ lesson.idLessons }}" class="card-link col-6 btn btn-outline-secondary">Voir le contenu</a>
+              <a *ngIf="canAddToCart(lesson.idLessons, lesson.idCourses)" routerLink="#" class="col btn btn-primary">Ajouter au panier</a>
             </div>
           </div>
         </div>
