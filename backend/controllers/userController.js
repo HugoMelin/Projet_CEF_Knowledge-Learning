@@ -176,8 +176,9 @@ exports.updateUser = async (req, res) => {
 exports.verifyUser = async (req, res) => {
   try {
     const { token } = req.params;
-    const result = await User.verifyUser(token);
-    return res.status(200).json(result);
+    await User.verifyUser(token);
+
+    res.redirect('http://localhost:4200/verify-success');
   } catch (error) {
     if (error.message === 'Token de vérification invalide ou déjà utilisé') {
       return res.status(400).send(error.message);
