@@ -84,10 +84,34 @@ Le projet est organisé en trois parties principales :
 - Password: hmelin
 ````
 
-- Utilisateurs administrateur: 
+- Utilisateur administrateur: 
 ````
 - Email: admin@mail.fr
 - Password: Adminpass123
+````
+
+- Utilisatteur classique:
+````
+- Email: user@mail.fr
+- Password: Userpass123
+````
+
+## Peupler la base de données
+
+La base de données devrait être peuplée au build du container Docker. 
+
+Le cas échéant, vous trouverez les fichiers .sql pour initialiser la bdd dans le dossier : `./backend/database`
+
+## Carte de payement factice
+
+- Payement accepté : 
+````
+4242 4242 4242 4242
+````
+
+- Payement refusé :
+````
+4000 0000 0000 0002
 ````
 
 ## Contribution
