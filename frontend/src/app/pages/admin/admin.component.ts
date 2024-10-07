@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { AdminThemeComponent } from '../../components/admin-theme/admin-theme.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [ CommonModule ],
+  imports: [ CommonModule, AdminThemeComponent ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
@@ -20,7 +21,7 @@ export class AdminComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.logged = this.authService.isLoggedIn();
+    this.logged = this.authService.getUSerRole() === 'admin';
 
     if (!this.logged) {
       this.router.navigate(['/connexion']);

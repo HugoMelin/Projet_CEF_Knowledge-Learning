@@ -33,7 +33,8 @@ export class ThemeService {
   }
 
   getThemes(): Observable<Theme[]> {
-    return this.http.get<Theme[]>(this.apiUrl);
+    const headers = this.getHeaders();
+    return this.http.get<Theme[]>(this.apiUrl, { headers });
   }
 
   getThemeById(themeId: number | undefined): Observable<Theme> {
@@ -75,5 +76,24 @@ export class ThemeService {
         return of('Inconnu');
       })
     );
+  }
+
+  deleteTheme(idThemes: number): Observable<any> {
+    const headers = this.getHeaders();
+    return this.http.delete(`${this.apiUrl}/${idThemes}`, { headers });
+  }
+
+  addTheme(themeName: string): Observable<Theme> {
+    const url = `${this.apiUrl}`;
+    const body = { name: themeName };
+    const headers = this.getHeaders();
+    return this.http.post<Theme>(url, body, { headers });
+  }
+
+  updateTheme(idThemes: number, themeName: string): Observable<Theme> {
+    const url = `${this.apiUrl}/${idThemes}`;
+    const body = { name: themeName };
+    const headers = this.getHeaders();
+    return this.http.patch<Theme>(url, body, { headers } );
   }
 }

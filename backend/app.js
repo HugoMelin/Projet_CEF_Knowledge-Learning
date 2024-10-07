@@ -13,7 +13,7 @@ const app = express();
 
 app.use(cors({
   origin: 'http://localhost:4200', // L'URL de votre application Angular
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Méthodes HTTP autorisées
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Méthodes HTTP autorisées
   allowedHeaders: ['Content-Type', 'Authorization'], // En-têtes autorisés
 }));
 
