@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, resolveForwardRef } from '@angular/core';
 import { environment } from '../../../environnements/environnements';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -50,17 +50,21 @@ export class PurchasesService {
     if (!this.authService.isVerified()) {
       const errorMessage = 'Votre compte n\'a pas été vérifié.';
       this.router.navigate(['/'], { queryParams: { error: errorMessage } });
-      return of([])
+      return of([]);
     }
-
+  
     if (!this.userPurchasesCache[userId]) {
       const headers = this.getHeaders();
       this.userPurchasesCache[userId] = this.http.get<Purchase[]>(`${this.apiUrl}/user/${userId}`, { headers }).pipe(
-        shareReplay(1),
-        catchError(error => {
+        map(response => response as Purchase[]),
+        catchError((error: HttpErrorResponse) => {
+          if (error.status === 404 && error.error?.message === "Aucun achat trouvé pour cet utilisateur") {
+            return of([]);
+          }
           console.error('Erreur lors de la récupération des achats:', error);
           return of([]);
-        })
+        }),
+        shareReplay(1)
       );
     }
     return this.userPurchasesCache[userId];

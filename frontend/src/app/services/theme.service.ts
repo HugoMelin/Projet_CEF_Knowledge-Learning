@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, forkJoin, of } from 'rxjs';
 import { map, mergeMap, catchError } from 'rxjs/operators';
 import { environment } from '../../environnements/environnements';
@@ -39,7 +39,7 @@ export class ThemeService {
   getThemeById(themeId: number | undefined): Observable<Theme> {
     return this.http.get<Theme>(`${this.apiUrl}/${themeId}`);
   }
-
+  
   getValidatedCertifications(userId?: number): Observable<CompletedCertification[]> {
     const headers = this.getHeaders();
     return this.http.get<CompletedCertification[]>(`${environment.API_URL}/certifications/${userId}`, { headers }).pipe(
@@ -56,7 +56,13 @@ export class ThemeService {
           })
         );
       }),
-      catchError(error => {
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 404 && error.error?.message === "Aucune certification trouvée pour cet utilisateur") {
+          // Si c'est une erreur 404 avec le message spécifique, on retourne un tableau vide
+          return of([]);
+        }
+        // Pour les autres erreurs, on les log et on retourne un tableau vide
+        console.error('Erreur lors de la récupération des certifications:', error);
         return of([]);
       })
     );
