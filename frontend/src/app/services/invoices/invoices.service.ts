@@ -25,6 +25,11 @@ export class InvoiceService {
       'Authorization': `Bearer ${token}`
     });
   }
+  getAllInvoices(): Observable<Invoice[]> {
+    const url = `${this.apiUrl}`;
+    const headers = this.getHeaders();
+    return this.http.get<Invoice[]>(url, { headers });
+  }
 
   getUserInvoices(userId: number): Observable<Invoice[]> {
     const headers = this.getHeaders();

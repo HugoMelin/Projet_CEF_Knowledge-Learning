@@ -48,7 +48,7 @@ class Invoice {
    */
   static async findAll() {
     try {
-      const [rows] = await db.query('SELECT id_user, price, id_invoice FROM invoices');
+      const [rows] = await db.query('SELECT id_user, price, id_invoice, created_at FROM invoices');
       return rows.map((row) => new Invoice(...Object.values(row)));
     } catch (error) {
       console.error(`Erreur lors de la récupération de toutes les factures : ${error}`);
@@ -65,7 +65,7 @@ class Invoice {
    */
   static async findById(invoiceId) {
     try {
-      const [rows] = await db.query('SELECT id_user, price, id_invoice FROM invoices WHERE id_invoice = ?', [invoiceId]);
+      const [rows] = await db.query('SELECT id_user, price, id_invoice, created_at FROM invoices WHERE id_invoice = ?', [invoiceId]);
       return rows.length ? new Invoice(...Object.values(rows[0])) : null;
     } catch (error) {
       console.error(`Erreur lors de la recherche de la facture : ${error}`);

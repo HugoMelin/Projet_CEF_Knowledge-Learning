@@ -31,7 +31,7 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" (click)="showComponent('invoices')">
-              Mes factures
+              Factures
             </a>
           </li>
         </ul>
@@ -55,7 +55,7 @@
       <app-admin-courses *ngIf="currentComponent === 'courses'"></app-admin-courses>
       <app-admin-lessons *ngIf="currentComponent === 'lessons'"></app-admin-lessons>
       <app-admin-users *ngIf="currentComponent === 'users'"></app-admin-users>
-      <!--<app-invoices *ngIf="currentComponent === 'invoices'"></app-invoices>-->
+      <app-admin-invoices *ngIf="currentComponent === 'invoices'"></app-admin-invoices>
     </main>
   </div>
 </div>
