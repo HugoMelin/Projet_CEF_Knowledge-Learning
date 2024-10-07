@@ -96,6 +96,12 @@ Le projet est organisé en trois parties principales :
 - Password: Userpass123
 ````
 
+## Peupler la base de données
+
+La base de données devrait être peuplée au build du container Docker. 
+
+Le cas échéant, vous trouverez les fichiers .sql pour initialiser la bdd dans le dossier : `./backend/database`
+
 ## Carte de payement factice
 
 - Payement accepté : 
