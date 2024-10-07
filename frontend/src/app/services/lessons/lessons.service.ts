@@ -96,5 +96,31 @@ export class LessonsService {
       )
     );
   }
+
+  addLesson(lessonData: Omit<Lesson, 'idLessons'>): Observable<Lesson> {
+    const url = `${this.apiUrl}`;
+    const body = lessonData;
+    const headers = this.getHeaders();
+    return this.http.post<Lesson>(url, body, { headers });
+  }
+
+  updateLesson(idLesson: number, lessonData: Partial<Lesson>): Observable<Lesson> {
+    const url = `${this.apiUrl}/${idLesson}`;
+    const body = lessonData;
+    const headers = this.getHeaders();
+    return this.http.patch<Lesson>(url, body, { headers });
+  }
+
+  deleteLesson(idLesson: number): Observable<any> {
+    const url = `${this.apiUrl}/${idLesson}`;
+    const headers = this.getHeaders();
+    return this.http.delete(url, { headers });
+  }
+
+  getLessonCount(): Observable<number> {
+    return this.getAllLessons().pipe(
+      map(lessons => lessons.length)
+    );
+  }
 }
 

@@ -81,4 +81,9 @@ export class AuthService {
     const user = this.getUser();
     return user ? user.isVerified : false
   }
+
+  getUSerRole(): string {
+    const user = this.getUserFromStorage();
+    return user?.role.includes('role-admin') ? 'admin' : 'user';
+  }
 }

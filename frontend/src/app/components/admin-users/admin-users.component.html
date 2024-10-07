@@ -1,0 +1,54 @@
+<div class="card">
+  <div class="admin-users-container card-body">
+    <h2>Gestion des Utilisateurs</h2>
+  
+    <table class="table table-striped text-center">
+      <thead>
+        <tr>
+          <th>Nom d'utilisateur</th>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Vérifié</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of pagedUsers">
+          <td>{{user.username}}</td>
+          <td>{{user.email}}</td>
+          <td>
+            <select [ngModel]="getUserRole(user)" (ngModelChange)="updateUserRole(user, $event)">
+              <option value="role-user">Utilisateur</option>
+              <option value="role-admin">Administrateur</option>
+            </select>
+          </td>
+          <td>
+            <span [ngClass]="{'text-success': user.isVerified, 'text-danger': !user.isVerified}">
+              {{ user.isVerified ? 'Vérifié' : 'Non vérifié' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <nav *ngIf="totalPages > 1" aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="setPage(currentPage - 1)" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index"
+            [class.active]="currentPage === i + 1">
+          <a class="page-link" (click)="setPage(i + 1)">{{i + 1}}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" (click)="setPage(currentPage + 1)" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  
+    <p class="text-center text-danger">{{ errorMsg }}</p>
+  </div>
+</div>

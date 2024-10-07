@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, forkJoin, of } from 'rxjs';
 import { map, mergeMap, catchError } from 'rxjs/operators';
 import { environment } from '../../environnements/environnements';
@@ -33,13 +33,14 @@ export class ThemeService {
   }
 
   getThemes(): Observable<Theme[]> {
-    return this.http.get<Theme[]>(this.apiUrl);
+    const headers = this.getHeaders();
+    return this.http.get<Theme[]>(this.apiUrl, { headers });
   }
 
   getThemeById(themeId: number | undefined): Observable<Theme> {
     return this.http.get<Theme>(`${this.apiUrl}/${themeId}`);
   }
-
+  
   getValidatedCertifications(userId?: number): Observable<CompletedCertification[]> {
     const headers = this.getHeaders();
     return this.http.get<CompletedCertification[]>(`${environment.API_URL}/certifications/${userId}`, { headers }).pipe(
@@ -56,7 +57,11 @@ export class ThemeService {
           })
         );
       }),
-      catchError(error => {
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 404 && error.error?.message === "Aucune certification trouvée pour cet utilisateur") {
+          return of([]);
+        }
+        console.error('Erreur lors de la récupération des certifications:', error);
         return of([]);
       })
     );
@@ -69,5 +74,24 @@ export class ThemeService {
         return of('Inconnu');
       })
     );
+  }
+
+  deleteTheme(idThemes: number): Observable<any> {
+    const headers = this.getHeaders();
+    return this.http.delete(`${this.apiUrl}/${idThemes}`, { headers });
+  }
+
+  addTheme(themeName: string): Observable<Theme> {
+    const url = `${this.apiUrl}`;
+    const body = { name: themeName };
+    const headers = this.getHeaders();
+    return this.http.post<Theme>(url, body, { headers });
+  }
+
+  updateTheme(idThemes: number, themeName: string): Observable<Theme> {
+    const url = `${this.apiUrl}/${idThemes}`;
+    const body = { name: themeName };
+    const headers = this.getHeaders();
+    return this.http.patch<Theme>(url, body, { headers } );
   }
 }

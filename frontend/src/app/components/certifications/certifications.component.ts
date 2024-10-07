@@ -33,7 +33,7 @@ export class CertificationsComponent implements OnInit {
     }
   
     loadValidatedCertifications(): void {
-      const userId = 1; // Remplacez par l'ID de l'utilisateur actuel ou utilisez un service d'authentification
+      const userId = this.userId
       this.themeService.getValidatedCertifications(userId).subscribe(
         certifications => {
           this.validatedCertifications = certifications;

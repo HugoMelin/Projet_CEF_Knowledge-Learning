@@ -142,12 +142,11 @@ exports.updateUser = async (req, res) => {
     const { id } = req.params;
     const userData = req.body;
 
-    if (!validatePassword(userData.password)) {
-      return res.status(400).json({ error: 'Le mot de passe ne respecte pas les critères de sécurité' });
-    }
-
     // Hash password if provided
     if (userData.password) {
+      if (!validatePassword(userData.password)) {
+        return res.status(400).json({ error: 'Le mot de passe ne respecte pas les critères de sécurité' });
+      }
       userData.password = await bcrypt.hash(userData.password, 10);
     }
 

@@ -18,6 +18,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   total: number = 0;
   private authSubscription : Subscription = new Subscription;
   private totalSubscription: Subscription | undefined;
+  isAdmin:boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -30,6 +31,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     this.authSubscription = this.authService.currentUser.subscribe(() => {
       this.logged = this.authService.isLoggedIn();
+      this.isAdmin = this.authService.getUSerRole() === 'admin';
     });
 
     this.totalSubscription = this.cartService.getCartTotal().subscribe(

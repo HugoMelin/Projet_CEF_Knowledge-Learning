@@ -1,0 +1,54 @@
+<div class="container-fluid">
+  <div class="row">
+    <!-- Side menu -->
+    <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+      <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" (click)="showComponent('home')">
+              Profil
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="showComponent('themes')">
+              Thèmes
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="showComponent('courses')">
+              Cours
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="showComponent('lessons')">
+              Leçons
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="showComponent('users')">
+              Utilisateurs
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="showComponent('invoices')">
+              Factures
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Panneau administrateur</h1>
+      </div>
+
+      <app-admin-home *ngIf="currentComponent === 'home'"></app-admin-home>
+      <app-admin-theme *ngIf="currentComponent === 'themes'"></app-admin-theme>
+      <app-admin-courses *ngIf="currentComponent === 'courses'"></app-admin-courses>
+      <app-admin-lessons *ngIf="currentComponent === 'lessons'"></app-admin-lessons>
+      <app-admin-users *ngIf="currentComponent === 'users'"></app-admin-users>
+      <app-admin-invoices *ngIf="currentComponent === 'invoices'"></app-admin-invoices>
+    </main>
+  </div>
+</div>

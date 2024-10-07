@@ -49,6 +49,10 @@
             </li>
             <li class="nav-item btn btn-outline-primary ms-2">
               <a class="nav-link position-relative text-primary" routerLinkActive="active" routerLink="/compte">Mon compte</a>
+            </li>
+            <li *ngIf="isAdmin" class="nav-item btn btn-success ms-2">
+              <a class="nav-link position-relative text-white" routerLinkActive="admin" routerLink="/admin">Administration</a>
+            </li>
           </ul>
         </div>
       </div>

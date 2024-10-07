@@ -1,0 +1,30 @@
+<div class="card">
+  <div class="card-body admin-home-container text-center">
+    <h1>Statistiques clés</h1>
+  
+    <section class="key-statistics container-fluid mt-3">
+      <div class="statistics-grid d-flex flex-wrap gap-5 justify-content-evenly">
+        <div class="statistic-item">
+          <h5>Utilisateurs inscrits</h5>
+          <p class="text-success">{{ userCount }}</p>
+        </div>
+        <div class="statistic-item">
+          <h5>Nombre de factures</h5>
+          <p class="text-success">{{ invoiceCount }}</p>
+        </div>
+        <div class="statistic-item">
+          <h5>Montant total des factures</h5>
+          <p class="text-success">{{ totalInvoiceAmount | currency:'EUR' }}</p>
+        </div>
+        <div class="statistic-item">
+          <h5>Cours disponibles</h5>
+          <p class="text-success">{{ courseCount }}</p>
+        </div>
+        <div class="statistic-item">
+          <h5>Leçons publiées</h5>
+          <p class="text-success">{{ lessonCount }}</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

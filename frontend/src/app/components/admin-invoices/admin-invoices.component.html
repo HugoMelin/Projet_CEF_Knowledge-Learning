@@ -1,0 +1,51 @@
+<div class="card">
+  <div class="admin-invoices-container card-body">
+    <h2>Historique des Factures</h2>
+    <div class="mb-3 d-flex justify-content-end">
+      <strong>Montant total des factures : </strong>
+      <p class="ms-1 text-danger">{{ totalAmount | currency:'EUR':'symbol':'1.2-2' }}</p>
+    </div>
+  
+    <table class="table table-striped text-center">
+      <thead>
+        <tr>
+          <th>ID Facture</th>
+          <th>Nom d'utilisateur</th>
+          <th>Email</th>
+          <th>Prix</th>
+          <th>Date de création</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let invoice of pagedInvoices">
+          <td>{{invoice.idInvoice}}</td>
+          <td>{{invoice.username}}</td>
+          <td>{{invoice.email}}</td>
+          <td>{{invoice.price | currency:'EUR'}}</td>
+          <td>{{formatDate(invoice.created_at)}}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <nav *ngIf="totalPages > 1" aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="setPage(currentPage - 1)" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index"
+            [class.active]="currentPage === i + 1">
+          <a class="page-link" (click)="setPage(i + 1)">{{i + 1}}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" (click)="setPage(currentPage + 1)" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  
+    <p class="text-center text-danger">{{ errorMsg }}</p>
+  </div>
+</div>
