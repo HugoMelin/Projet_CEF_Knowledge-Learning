@@ -83,4 +83,24 @@ export class CoursesService {
       )
     );
   }
+
+  addCourse(courseData: any): Observable<any> {
+    const url = `${this.apiUrl}`
+    const body = courseData
+    const headers = this.getHeaders();
+    return this.http.post(url, body, { headers });
+  }
+
+  deleteCourse(courseId: number): Observable<any> {
+    const url = `${this.apiUrl}/${courseId}`;
+    const headers = this.getHeaders();
+    return this.http.delete(url, { headers });
+  }
+
+  updateCourse(courseId: number, courseData: any): Observable<any> {
+    const url = `${this.apiUrl}/${courseId}`;
+    const body = courseData;
+    const headers = this.getHeaders();
+    return this.http.patch(url, body, { headers });
+  }
 }

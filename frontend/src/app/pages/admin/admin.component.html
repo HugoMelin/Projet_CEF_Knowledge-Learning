@@ -16,7 +16,7 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" (click)="showComponent('courses')">
-              Cours validés
+              Cours
             </a>
           </li>
           <li class="nav-item">
@@ -52,8 +52,8 @@
       </div>
 
       <app-admin-theme *ngIf="currentComponent === 'themes'"></app-admin-theme>
-      <!--<app-validated-courses *ngIf="currentComponent === 'courses'"></app-validated-courses>
-      <app-certifications *ngIf="currentComponent === 'certifications'"></app-certifications>
+      <app-admin-courses *ngIf="currentComponent === 'courses'"></app-admin-courses>
+      <!--<app-certifications *ngIf="currentComponent === 'certifications'"></app-certifications>
       <app-purchases *ngIf="currentComponent === 'purchases'"></app-purchases>
       <app-invoices *ngIf="currentComponent === 'invoices'"></app-invoices>-->
     </main>

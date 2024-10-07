@@ -59,10 +59,8 @@ export class ThemeService {
       }),
       catchError((error: HttpErrorResponse) => {
         if (error.status === 404 && error.error?.message === "Aucune certification trouvée pour cet utilisateur") {
-          // Si c'est une erreur 404 avec le message spécifique, on retourne un tableau vide
           return of([]);
         }
-        // Pour les autres erreurs, on les log et on retourne un tableau vide
         console.error('Erreur lors de la récupération des certifications:', error);
         return of([]);
       })
