@@ -20,8 +20,8 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" (click)="showComponent('certifications')">
-              Certifications
+            <a class="nav-link" (click)="showComponent('lessons')">
+              Leçons
             </a>
           </li>
           <li class="nav-item">
@@ -53,8 +53,8 @@
 
       <app-admin-theme *ngIf="currentComponent === 'themes'"></app-admin-theme>
       <app-admin-courses *ngIf="currentComponent === 'courses'"></app-admin-courses>
-      <!--<app-certifications *ngIf="currentComponent === 'certifications'"></app-certifications>
-      <app-purchases *ngIf="currentComponent === 'purchases'"></app-purchases>
+      <app-admin-lessons *ngIf="currentComponent === 'lessons'"></app-admin-lessons>
+      <!--<app-purchases *ngIf="currentComponent === 'purchases'"></app-purchases>
       <app-invoices *ngIf="currentComponent === 'invoices'"></app-invoices>-->
     </main>
   </div>

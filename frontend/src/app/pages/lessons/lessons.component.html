@@ -21,7 +21,7 @@
     </div>
   </div>
 
-  <nav aria-label="Page navigation" class="mt-4">
+  <nav *ngIf="totalPages > 1" aria-label="Page navigation" class="mt-4">
     <ul class="pagination justify-content-center">
       <li class="page-item" [class.disabled]="currentPage === 1">
         <a class="page-link" (click)="setPage(currentPage - 1)" aria-label="Previous">

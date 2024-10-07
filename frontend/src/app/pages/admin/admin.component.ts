@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AdminThemeComponent } from '../../components/admin-theme/admin-theme.component';
 import { AdminCoursesComponent } from '../../components/admin-courses/admin-courses.component';
+import { AdminLessonsComponent } from '../../components/admin-lessons/admin-lessons.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [ CommonModule, AdminThemeComponent, AdminCoursesComponent ],
+  imports: [ CommonModule, AdminThemeComponent, AdminCoursesComponent, AdminLessonsComponent ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
