@@ -99,7 +99,6 @@ class PaymentController {
         return Purchase.create(purchaseData);
       }));
 
-      //window.location.href = 'http://localhost:4200/payement-succes';
       res.redirect('http://localhost:4200/payement-succes'); // Redirect to success page
     } catch (error) {
       console.error('Erreur détaillée:', error);

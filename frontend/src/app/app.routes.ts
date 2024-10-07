@@ -12,6 +12,7 @@ import { PayementCancelComponent } from './pages/payement-cancel/payement-cancel
 import { LessonComponent } from './pages/lesson/lesson.component';
 import { CompteComponent } from './pages/compte/compte.component';
 import { AdminComponent } from './pages/admin/admin.component';
+import { VerifySuccesComponent } from './pages/verify-succes/verify-succes.component';
 
 export const routes: Routes = [
   {path: "", component: IndexComponent, title: "Knowledge Learning"},
@@ -27,4 +28,5 @@ export const routes: Routes = [
   {path: "payement-cancel", component: PayementCancelComponent, title: "Payement refusé | Knowledge Learning"},
   {path: "compte", component: CompteComponent, title: "Mon compte | Knowledge Learning"},
   {path: "admin", component: AdminComponent, title: "Administration | Knowledge Learning"},
+  {path: "verify-success", component: VerifySuccesComponent, title: "Compte vérifié  | Knowledge Learning"},
 ];

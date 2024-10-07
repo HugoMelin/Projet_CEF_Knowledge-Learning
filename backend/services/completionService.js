@@ -1,4 +1,4 @@
-const CompletedLessons = require('../models/CompletedLesson');
+const CompletedLessons = require('../models/completedLesson');
 const CompletedCourse = require('../models/CompletedCourse');
 const Certification = require('../models/Certification');
 const Lesson = require('../models/Lesson');

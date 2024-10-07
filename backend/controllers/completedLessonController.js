@@ -1,4 +1,4 @@
-const CompletedLesson = require('../models/CompletedLesson');
+const CompletedLesson = require('../models/completedLesson');
 const CompletionService = require('../services/completionService');
 
 /**
