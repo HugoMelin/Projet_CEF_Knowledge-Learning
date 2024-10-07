@@ -43,14 +43,7 @@
         <h1 class="h2">Panneau administrateur</h1>
       </div>
 
-      <div *ngIf="currentComponent === 'home'">
-        <div class="card">
-          <div class="card-body">
-            <h4 class="card-title">Informations utilisateur</h4>
-          </div>
-        </div>
-      </div>
-
+      <app-admin-home *ngIf="currentComponent === 'home'"></app-admin-home>
       <app-admin-theme *ngIf="currentComponent === 'themes'"></app-admin-theme>
       <app-admin-courses *ngIf="currentComponent === 'courses'"></app-admin-courses>
       <app-admin-lessons *ngIf="currentComponent === 'lessons'"></app-admin-lessons>

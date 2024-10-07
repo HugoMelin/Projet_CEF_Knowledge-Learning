@@ -116,5 +116,11 @@ export class LessonsService {
     const headers = this.getHeaders();
     return this.http.delete(url, { headers });
   }
+
+  getLessonCount(): Observable<number> {
+    return this.getAllLessons().pipe(
+      map(lessons => lessons.length)
+    );
+  }
 }
 

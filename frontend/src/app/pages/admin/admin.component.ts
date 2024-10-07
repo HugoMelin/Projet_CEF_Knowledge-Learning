@@ -7,17 +7,18 @@ import { AdminCoursesComponent } from '../../components/admin-courses/admin-cour
 import { AdminLessonsComponent } from '../../components/admin-lessons/admin-lessons.component';
 import { AdminUsersComponent } from '../../components/admin-users/admin-users.component';
 import { AdminInvoicesComponent } from '../../components/admin-invoices/admin-invoices.component';
+import { AdminHomeComponent } from '../../components/admin-home/admin-home.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [ CommonModule, AdminThemeComponent, AdminCoursesComponent, AdminLessonsComponent, AdminUsersComponent, AdminInvoicesComponent ],
+  imports: [ CommonModule, AdminThemeComponent, AdminCoursesComponent, AdminLessonsComponent, AdminUsersComponent, AdminInvoicesComponent, AdminHomeComponent ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnInit {
   logged:boolean = false;
-  currentComponent:string = 'profile'
+  currentComponent:string = 'home'
 
   constructor(
     private router: Router,

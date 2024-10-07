@@ -103,4 +103,10 @@ export class CoursesService {
     const headers = this.getHeaders();
     return this.http.patch(url, body, { headers });
   }
+
+  getCourseCount(): Observable<number> {
+    return this.getAllCourses().pipe(
+      map(courses => courses.length)
+    );
+  }
 }

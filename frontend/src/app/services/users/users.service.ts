@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environnements/environnements';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 
 interface User {
   idUser: number;
@@ -63,5 +63,11 @@ export class UsersService {
         `le corps était : ${JSON.stringify(error.error)}`);
     }
     return throwError(error.error.error || 'Une erreur s\'est produite, veuillez réessayer plus tard.');
+  }
+
+  getUserCount(): Observable<number> {
+    return this.getAllUsers().pipe(
+      map(users => users.length)
+    );
   }
 }
