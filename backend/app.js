@@ -24,6 +24,7 @@ app.use(cookieParser(process.env.COOKIE_PARSER_KEY, {
   sameSite: 'strict',
 }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/docs', express.static(path.join(`${__dirname}/docs`)));
 
 app.use('/api', indexRouter);
 

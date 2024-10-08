@@ -29,7 +29,23 @@
             <pre class="prettyprint source linenums"><code>const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const PasswordValidator = require('password-validator');
 const { sendVerificationEmail } = require('../services/emailsService');
+
+const validatePassword = (password) => {
+  const schema = new PasswordValidator();
+
+  schema
+    .is().min(8)
+    .is().max(100)
+    .has().uppercase()
+    .has().lowercase()
+    .has().digits(2)
+    .has().not().spaces()
+    .is().not().oneOf(['Passw0rd', 'Password123']);
+
+  return schema.validate(password);
+};
 
 /**
  * Creates a new user.
@@ -45,6 +61,10 @@ exports.createUser = async (req, res) => {
     // Validate required fields
     if (!userData.email || !userData.password || !userData.username) {
       return res.status(400).json({ message: 'Email, mot de passe et nom d\'utilisateur sont requis' });
+    }
+
+    if (!validatePassword(userData.password)) {
+      return res.status(400).json({ error: 'Le mot de passe ne respecte pas les critères de sécurité' });
     }
 
     // Check for existing user
@@ -152,6 +172,9 @@ exports.updateUser = async (req, res) => {
 
     // Hash password if provided
     if (userData.password) {
+      if (!validatePassword(userData.password)) {
+        return res.status(400).json({ error: 'Le mot de passe ne respecte pas les critères de sécurité' });
+      }
       userData.password = await bcrypt.hash(userData.password, 10);
     }
 
@@ -181,8 +204,9 @@ exports.updateUser = async (req, res) => {
 exports.verifyUser = async (req, res) => {
   try {
     const { token } = req.params;
-    const result = await User.verifyUser(token);
-    return res.status(200).json(result);
+    await User.verifyUser(token);
+
+    res.redirect('http://localhost:4200/verify-success');
   } catch (error) {
     if (error.message === 'Token de vérification invalide ou déjà utilisé') {
       return res.status(400).send(error.message);
@@ -227,7 +251,11 @@ exports.authenticate = async (req, res) => {
 
       res.header('Authorization', `Bearer ${token}`);
 
-      return res.status(200).json('Authentification réussi');
+      return res.status(200).json({
+        message: 'Authentification réussie',
+        token,
+        user,
+      });
     }
     return res.status(403).json('Mauvaise adresse mail');
   } catch (error) {
@@ -244,13 +272,13 @@ exports.authenticate = async (req, res) => {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Certification.html">Certification</a></li><li><a href="CompletedCourse.html">CompletedCourse</a></li><li><a href="CompletedLesson.html">CompletedLesson</a></li><li><a href="CompletionService.html">CompletionService</a></li><li><a href="Course.html">Course</a></li><li><a href="Invoice.html">Invoice</a></li><li><a href="Lesson.html">Lesson</a></li><li><a href="PaymentController.html">PaymentController</a></li><li><a href="Purchase.html">Purchase</a></li><li><a href="StripeService.html">StripeService</a></li><li><a href="Theme.html">Theme</a></li><li><a href="User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#checkAdminRole">checkAdminRole</a></li><li><a href="global.html#checkAuth">checkAuth</a></li><li><a href="global.html#checkCourseAccess">checkCourseAccess</a></li><li><a href="global.html#checkIfVerify">checkIfVerify</a></li><li><a href="global.html#checkJWT">checkJWT</a></li><li><a href="global.html#checkUserRole">checkUserRole</a></li><li><a href="global.html#createCertification">createCertification</a></li><li><a href="global.html#createCheckoutSession">createCheckoutSession</a></li><li><a href="global.html#createCompletedCourse">createCompletedCourse</a></li><li><a href="global.html#createCompletedLesson">createCompletedLesson</a></li><li><a href="global.html#createCourse">createCourse</a></li><li><a href="global.html#createInvoice">createInvoice</a></li><li><a href="global.html#createLesson">createLesson</a></li><li><a href="global.html#createPurchase">createPurchase</a></li><li><a href="global.html#createTheme">createTheme</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#deleteCertification">deleteCertification</a></li><li><a href="global.html#deleteCompletedCourse">deleteCompletedCourse</a></li><li><a href="global.html#deleteCompletedLesson">deleteCompletedLesson</a></li><li><a href="global.html#deleteCourse">deleteCourse</a></li><li><a href="global.html#deleteInvoice">deleteInvoice</a></li><li><a href="global.html#deleteLesson">deleteLesson</a></li><li><a href="global.html#deletePurchase">deletePurchase</a></li><li><a href="global.html#deleteTheme">deleteTheme</a></li><li><a href="global.html#deleteUser">deleteUser</a></li><li><a href="global.html#generateVerificationToken">generateVerificationToken</a></li><li><a href="global.html#getAllCertifications">getAllCertifications</a></li><li><a href="global.html#getAllCompletedCourses">getAllCompletedCourses</a></li><li><a href="global.html#getAllCompletedLessons">getAllCompletedLessons</a></li><li><a href="global.html#getAllCourses">getAllCourses</a></li><li><a href="global.html#getAllInvoices">getAllInvoices</a></li><li><a href="global.html#getAllLessons">getAllLessons</a></li><li><a href="global.html#getAllPurchases">getAllPurchases</a></li><li><a href="global.html#getAllThemes">getAllThemes</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#getCertificationByUserIdAndThemeId">getCertificationByUserIdAndThemeId</a></li><li><a href="global.html#getCertificationsByUserId">getCertificationsByUserId</a></li><li><a href="global.html#getCompletedCoursesByUserId">getCompletedCoursesByUserId</a></li><li><a href="global.html#getCompletedCoursesByUserIdAndCoursesId">getCompletedCoursesByUserIdAndCoursesId</a></li><li><a href="global.html#getCompletedLessonsByUserId">getCompletedLessonsByUserId</a></li><li><a href="global.html#getCompletedLessonsByUserIdAndLessonsId">getCompletedLessonsByUserIdAndLessonsId</a></li><li><a href="global.html#getInvoiceById">getInvoiceById</a></li><li><a href="global.html#getInvoicesByUserId">getInvoicesByUserId</a></li><li><a href="global.html#getOneCourseById">getOneCourseById</a></li><li><a href="global.html#getOneLessonById">getOneLessonById</a></li><li><a href="global.html#getOneThemeById">getOneThemeById</a></li><li><a href="global.html#getOneUserById">getOneUserById</a></li><li><a href="global.html#getPurchaseById">getPurchaseById</a></li><li><a href="global.html#getPurchasesByUserId">getPurchasesByUserId</a></li><li><a href="global.html#handleSuccess">handleSuccess</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#sendVerificationEmail">sendVerificationEmail</a></li><li><a href="global.html#transporter">transporter</a></li><li><a href="global.html#updateCertification">updateCertification</a></li><li><a href="global.html#updateCompletedCourse">updateCompletedCourse</a></li><li><a href="global.html#updateCompletedLesson">updateCompletedLesson</a></li><li><a href="global.html#updateCourse">updateCourse</a></li><li><a href="global.html#updateInvoice">updateInvoice</a></li><li><a href="global.html#updateLesson">updateLesson</a></li><li><a href="global.html#updatePurchase">updatePurchase</a></li><li><a href="global.html#updateTheme">updateTheme</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#verifyUser">verifyUser</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Certification.html">Certification</a></li><li><a href="CompletedCourse.html">CompletedCourse</a></li><li><a href="CompletedLesson.html">CompletedLesson</a></li><li><a href="CompletionService.html">CompletionService</a></li><li><a href="Course.html">Course</a></li><li><a href="Invoice.html">Invoice</a></li><li><a href="Lesson.html">Lesson</a></li><li><a href="PaymentController.html">PaymentController</a></li><li><a href="Purchase.html">Purchase</a></li><li><a href="StripeService.html">StripeService</a></li><li><a href="Theme.html">Theme</a></li><li><a href="User.html">User</a></li></ul><h3>Global</h3><ul><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#checkAdminRole">checkAdminRole</a></li><li><a href="global.html#checkAuth">checkAuth</a></li><li><a href="global.html#checkCourseAccess">checkCourseAccess</a></li><li><a href="global.html#checkIfVerify">checkIfVerify</a></li><li><a href="global.html#checkJWT">checkJWT</a></li><li><a href="global.html#checkUserRole">checkUserRole</a></li><li><a href="global.html#createCertification">createCertification</a></li><li><a href="global.html#createCheckoutSession">createCheckoutSession</a></li><li><a href="global.html#createCompletedCourse">createCompletedCourse</a></li><li><a href="global.html#createCompletedLesson">createCompletedLesson</a></li><li><a href="global.html#createCourse">createCourse</a></li><li><a href="global.html#createInvoice">createInvoice</a></li><li><a href="global.html#createLesson">createLesson</a></li><li><a href="global.html#createPurchase">createPurchase</a></li><li><a href="global.html#createTheme">createTheme</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#deleteCertification">deleteCertification</a></li><li><a href="global.html#deleteCompletedCourse">deleteCompletedCourse</a></li><li><a href="global.html#deleteCompletedLesson">deleteCompletedLesson</a></li><li><a href="global.html#deleteCourse">deleteCourse</a></li><li><a href="global.html#deleteInvoice">deleteInvoice</a></li><li><a href="global.html#deleteLesson">deleteLesson</a></li><li><a href="global.html#deletePurchase">deletePurchase</a></li><li><a href="global.html#deleteTheme">deleteTheme</a></li><li><a href="global.html#deleteUser">deleteUser</a></li><li><a href="global.html#generateVerificationToken">generateVerificationToken</a></li><li><a href="global.html#getAllCertifications">getAllCertifications</a></li><li><a href="global.html#getAllCompletedCourses">getAllCompletedCourses</a></li><li><a href="global.html#getAllCompletedLessons">getAllCompletedLessons</a></li><li><a href="global.html#getAllCourses">getAllCourses</a></li><li><a href="global.html#getAllInvoices">getAllInvoices</a></li><li><a href="global.html#getAllLessons">getAllLessons</a></li><li><a href="global.html#getAllPurchases">getAllPurchases</a></li><li><a href="global.html#getAllThemes">getAllThemes</a></li><li><a href="global.html#getAllUsers">getAllUsers</a></li><li><a href="global.html#getCertificationByUserIdAndThemeId">getCertificationByUserIdAndThemeId</a></li><li><a href="global.html#getCertificationsByUserId">getCertificationsByUserId</a></li><li><a href="global.html#getCompletedCoursesByUserId">getCompletedCoursesByUserId</a></li><li><a href="global.html#getCompletedCoursesByUserIdAndCoursesId">getCompletedCoursesByUserIdAndCoursesId</a></li><li><a href="global.html#getCompletedLessonsByUserId">getCompletedLessonsByUserId</a></li><li><a href="global.html#getCompletedLessonsByUserIdAndLessonsId">getCompletedLessonsByUserIdAndLessonsId</a></li><li><a href="global.html#getCoursesByThemeId">getCoursesByThemeId</a></li><li><a href="global.html#getInvoiceById">getInvoiceById</a></li><li><a href="global.html#getInvoicesByUserId">getInvoicesByUserId</a></li><li><a href="global.html#getLessonsByCourseId">getLessonsByCourseId</a></li><li><a href="global.html#getOneCourseById">getOneCourseById</a></li><li><a href="global.html#getOneLessonById">getOneLessonById</a></li><li><a href="global.html#getOneThemeById">getOneThemeById</a></li><li><a href="global.html#getOneUserById">getOneUserById</a></li><li><a href="global.html#getPurchaseById">getPurchaseById</a></li><li><a href="global.html#getPurchasesByUserId">getPurchasesByUserId</a></li><li><a href="global.html#handleSuccess">handleSuccess</a></li><li><a href="global.html#pool">pool</a></li><li><a href="global.html#sendVerificationEmail">sendVerificationEmail</a></li><li><a href="global.html#transporter">transporter</a></li><li><a href="global.html#updateCertification">updateCertification</a></li><li><a href="global.html#updateCompletedCourse">updateCompletedCourse</a></li><li><a href="global.html#updateCompletedLesson">updateCompletedLesson</a></li><li><a href="global.html#updateCourse">updateCourse</a></li><li><a href="global.html#updateInvoice">updateInvoice</a></li><li><a href="global.html#updateLesson">updateLesson</a></li><li><a href="global.html#updatePurchase">updatePurchase</a></li><li><a href="global.html#updateTheme">updateTheme</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#verifyUser">verifyUser</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Oct 03 2024 23:09:14 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Tue Oct 08 2024 00:35:34 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>

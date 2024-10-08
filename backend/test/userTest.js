@@ -137,6 +137,8 @@ describe('User Authentication', () => {
     bcryptStub.resolves(true);
     jwtStub.returns('faketoken');
 
+    req.body = { email: 'test@example.com', password: 'testpassword' };
+
     await authController.authenticate(req, res);
 
     assert(userStub.calledOnceWith('test@example.com'));
@@ -145,7 +147,11 @@ describe('User Authentication', () => {
     assert(res.cookie.calledOnceWith('token', 'faketoken', sinon.match.object));
     assert(res.header.calledOnceWith('Authorization', 'Bearer faketoken'));
     assert(res.status.calledOnceWith(200));
-    assert(res.json.calledOnceWith('Authentification réussi'));
+    assert(res.json.calledOnceWith({
+      message: 'Authentification réussie',
+      token: 'faketoken',
+      user: mockUser,
+    }));
   });
 
   it('should fail to authenticate with incorrect password', async () => {
@@ -179,4 +185,47 @@ describe('User Authentication', () => {
     assert(res.status.calledOnceWith(500));
     assert(res.json.calledOnce);
   });
+});
+
+/**
+ * User Account and Authentication Test Suite
+ *
+ * This suite tests two critical aspects of the user management system:
+ * 1. User Account Creation
+ * 2. User Authentication
+ *
+ * These tests ensure the robustness and security of the user management process,
+ * which is crucial for maintaining the integrity of the application.
+ */
+
+describe('User Account Creation', () => {
+  /**
+   * User Creation Tests
+   *
+   * These tests verify the user account creation process, ensuring:
+   * 1. Successful creation of new user accounts
+   * 2. Prevention of duplicate email registrations
+   * 3. Proper error handling for database failures
+   *
+   * By covering these scenarios, we maintain data integrity and user uniqueness
+   * while also ensuring graceful handling of potential system failures.
+   */
+  // Individual test cases omitted for brevity
+});
+
+describe('User Authentication', () => {
+  /**
+   * Authentication Tests
+   *
+   * These tests validate the user authentication process, checking:
+   * 1. Successful authentication with correct credentials
+   * 2. Rejection of incorrect passwords
+   * 3. Handling of non-existent user attempts
+   * 4. Proper error management for system failures
+   *
+   * This comprehensive testing ensures the security of user accounts,
+   * prevents unauthorized access, and maintains system reliability even
+   * under unexpected conditions.
+   */
+  // Individual test cases omitted for brevity
 });

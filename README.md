@@ -114,6 +114,10 @@ Le cas échéant, vous trouverez les fichiers .sql pour initialiser la bdd dans 
 4000 0000 0000 0002
 ````
 
+## Accès à la documentation de l'API
+
+Vous trouverez la documentation de l'API au chemin suivant : `http://localhost:3000/docs/`
+
 ## Contribution
 
 Ce projet a été développé par Hugo Melin dans le cadre d'une formation au CEF. Les contributions externes ne sont pas acceptées pour le moment.
